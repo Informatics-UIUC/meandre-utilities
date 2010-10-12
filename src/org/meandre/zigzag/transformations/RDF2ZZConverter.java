@@ -62,6 +62,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
  * 
  * Dependencies:
  * 
+ * jena-2.6.3.jar
  * meandre-repository-1.4.9.jar
  *
  * @author Boris Capitanu
