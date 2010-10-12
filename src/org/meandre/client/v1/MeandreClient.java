@@ -34,7 +34,6 @@ import org.meandre.client.utils.GenericHttpClient;
 import org.meandre.client.utils.KeyValuePair;
 import org.meandre.client.utils.handlers.JSONResponseHandler;
 import org.meandre.client.utils.handlers.RDFModelResponseHandler;
-import org.meandre.client.utils.handlers.StreamResponseHandler;
 import org.meandre.client.utils.handlers.StringResponseHandler;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
@@ -938,7 +937,7 @@ public class MeandreClient {
             nvps.add(new BasicNameValuePair("token", token));
 
         NameValuePair[] args = new BasicNameValuePair[nvps.size()];
-        return _httpClient.doGET(reqPath, null, StreamResponseHandler.getInstance(), nvps.toArray(args));
+        return _httpClient.doGET(reqPath, null, nvps.toArray(args));
     }
 
     /**
@@ -958,7 +957,7 @@ public class MeandreClient {
     public JSONObject retrieveWebUIInfo(String token) throws TransmissionException {
         String reqPath = "/services/execute/uri_flow.txt";
         NameValuePair argToken = new BasicNameValuePair("token", token);
-        InputStream results = _httpClient.doGET(reqPath, null, StreamResponseHandler.getInstance(), argToken);
+        InputStream results = _httpClient.doGET(reqPath, null, argToken);
 
         Properties properties = new Properties();
         try {
@@ -1136,7 +1135,7 @@ public class MeandreClient {
      */
     public QueryableRepository retrievePublicRepository() throws TransmissionException {
         String reqPath = "/public/services/repository.nt";
-        InputStream modelStream = _httpClient.doGET(reqPath, null, StreamResponseHandler.getInstance());
+        InputStream modelStream = _httpClient.doGET(reqPath, null);
 
         Model model = ModelFactory.createDefaultModel();
         model.read(modelStream, null, "N-TRIPLE");
@@ -1153,7 +1152,7 @@ public class MeandreClient {
      */
     public QueryableRepository retrieveDemoRepository() throws TransmissionException {
         String reqPath = "/public/services/demo_repository.nt";
-        InputStream modelStream = _httpClient.doGET(reqPath, null, StreamResponseHandler.getInstance());
+        InputStream modelStream = _httpClient.doGET(reqPath, null);
         
         Model model = ModelFactory.createDefaultModel();
         model.read(modelStream, null, "N-TRIPLE");

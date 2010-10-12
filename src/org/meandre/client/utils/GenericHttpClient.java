@@ -1,16 +1,20 @@
 package org.meandre.client.utils;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
@@ -22,12 +26,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.meandre.client.exceptions.TransmissionException;
@@ -80,7 +93,15 @@ public class GenericHttpClient {
             }
         };
 
-        _httpClient = new DefaultHttpClient();
+        HttpParams params = new BasicHttpParams();
+        ConnManagerParams.setMaxTotalConnections(params, 200);
+        ConnPerRouteBean connPerRoute = new ConnPerRouteBean(20);
+        ConnManagerParams.setMaxConnectionsPerRoute(params, connPerRoute);
+        SchemeRegistry schreg = new SchemeRegistry();
+        schreg.register(new Scheme(_host.getSchemeName(), PlainSocketFactory.getSocketFactory(), _host.getPort()));
+        
+        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schreg);
+        _httpClient = new DefaultHttpClient(cm, params);
         // Add as the very first interceptor in the protocol chain
         _httpClient.addRequestInterceptor(preemptiveAuth, 0);
     }
@@ -127,6 +148,27 @@ public class GenericHttpClient {
         
         try {
             return _httpClient.execute(_host, httpGet, handler);
+        }
+        catch (Exception e) {
+            throw new TransmissionException(e);
+        }
+    }
+    
+    public InputStream doGET(String reqPath, List<Header> headers, NameValuePair... params) throws TransmissionException {
+        if (params.length > 0)
+            reqPath += "?" + URLEncodedUtils.format(Arrays.asList(params), "UTF-8");
+ 
+        HttpGet httpGet = new HttpGet(reqPath);     
+        if (headers != null)
+            for (Header header : headers)
+                httpGet.addHeader(header);
+        
+        try {
+            HttpResponse response = _httpClient.execute(_host, httpGet);
+            HttpEntity entity = response.getEntity();
+            InputStream stream = entity.getContent();
+            
+            return new BufferedInputStream(stream);
         }
         catch (Exception e) {
             throw new TransmissionException(e);

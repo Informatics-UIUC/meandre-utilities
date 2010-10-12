@@ -813,7 +813,7 @@ public class MeandreClientTest {
      * {@link org.meandre.client.MeandreClient#uploadFiles(Set<File>, boolean)}.
      */
     @Test
-    public void testRunRepositorys() {
+    public void testRunRepository() {
         Model mod = DemoRepositoryGenerator.getTestHelloWorldMoreHetereogenousRepository();
         try{
             String ret = _meandreClient.runRepository(mod);
