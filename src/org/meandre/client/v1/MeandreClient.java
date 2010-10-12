@@ -56,6 +56,30 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * <p>The setCredentials() method must be called before authorized calls on
  * a MeandreClient can be invoked. All calls are authorized unless they say
  * specifically that they do not require authorization.
+ * 
+ * Dependencies required for this to work:
+ * 
+ * apache-mime4j-0.6.jar
+ * arq-2.8.4.jar
+ * commons-codec-1.3.jar
+ * commons-logging-1.1.1.jar
+ * httpclient-4.0.3.jar
+ * httpcore-4.0.1.jar
+ * httpmime-4.0.3.jar
+ * icu4j-3.4.4.jar
+ * iri-0.8.jar
+ * jena-2.6.3.jar
+ * json.jar
+ * log4j-1.2.13.jar
+ * lucene-core-2.3.1.jar
+ * meandre-repository-api-1.4.9.jar
+ * meandre-security-1.4.9.jar
+ * seasr-commons.jar
+ * slf4j-api-1.5.8.jar
+ * slf4j-log4j12-1.5.8.jar
+ * stax-api-1.0.1.jar
+ * wstx-asl-3.2.9.jar
+ * xercesImpl-2.7.1.jar
  *
  * @author Boris Capitanu
  */
