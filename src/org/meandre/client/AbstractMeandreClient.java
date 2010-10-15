@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -484,24 +485,35 @@ public abstract class AbstractMeandreClient {
      */
     public abstract boolean ping() throws TransmissionException;
 
-    public static AbstractMeandreClient getClientForServer(String hostName, int port) {
+    public static AbstractMeandreClient getClientForServer(String hostName, int port, String userName, String password) {
+        AbstractMeandreClient client = null;
+
         try {
             // Check what version of the server we're connecting to
             URL versionUrl = new URL("http", hostName, port, "/services/about/version.json");
-            String ver = IOUtils.getTextFromReader(new InputStreamReader(versionUrl.openStream()));
+            URLConnection connection = versionUrl.openConnection();
+            if (userName != null && password != null) {
+                String userPassword = userName + ":" + password;
+                String encoding = new sun.misc.BASE64Encoder().encode (userPassword.getBytes());
+                connection.setRequestProperty("Authorization", "Basic " + encoding);
+            }
+            String ver = IOUtils.getTextFromReader(new InputStreamReader(connection.getInputStream()));
             JSONObject joVersion = new JSONObject(ver);
             
             if (joVersion.getString("version").startsWith("1.4"))
-                return new org.meandre.client.v1.MeandreClient(hostName, port);
-            
+                client = new org.meandre.client.v1.MeandreClient(hostName, port);
+
             if (joVersion.getString("version").startsWith("2.0"))
-                return new org.meandre.client.v2.MeandreClient(hostName, port);
-            
-            return null;
+                client = new org.meandre.client.v2.MeandreClient(hostName, port);
         }
         catch (Exception e) {
             // Assume 2.0
-            return new org.meandre.client.v2.MeandreClient(hostName, port);
+            client = new org.meandre.client.v2.MeandreClient(hostName, port);
         }
+        
+        if (client != null && userName != null)
+            client.setCredentials(userName, password);
+        
+        return client;
     }
 }

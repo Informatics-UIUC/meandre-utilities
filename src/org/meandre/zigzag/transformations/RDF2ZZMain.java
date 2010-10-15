@@ -136,10 +136,9 @@ public class RDF2ZZMain {
             if (server == null)
                 parseArguments(new String[] { "--help" });
 
-            AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(server, port);
+            AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(server, port, user, password);
             client.setLogger(_logger);
             if (user != null && password != null) {
-                client.setCredentials(user, password);
                 repository = client.retrieveRepository();
                 importSource = null;
             } else {
