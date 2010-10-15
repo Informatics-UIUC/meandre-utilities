@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.meandre.client.AbstractMeandreClient;
 import org.meandre.client.exceptions.TransmissionException;
 import org.meandre.client.utils.ClientLoggerFactory;
 import org.meandre.client.utils.GenericHttpClient;
@@ -82,7 +83,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  *
  * @author Boris Capitanu
  */
-public class MeandreClient {
+public class MeandreClient extends AbstractMeandreClient {
 
     private final GenericHttpClient _httpClient;
 
@@ -100,18 +101,34 @@ public class MeandreClient {
         _httpClient = new GenericHttpClient(serverHost, port, ClientLoggerFactory.getClientLogger());
     }
 
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#setCredentials(java.lang.String, java.lang.String)
+     */
+    @Override
     public void setCredentials(String userName, String password) {
         _httpClient.setCredentials(userName, password);
     }
     
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#setLogger(java.util.logging.Logger)
+     */
+    @Override
     public void setLogger(Logger logger) {
         _httpClient.setLogger(logger);
     }
     
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#getLogger()
+     */
+    @Override
     public Logger getLogger() {
         return _httpClient.getLogger();
     }
     
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#close()
+     */
+    @Override
     public void close() {
         _httpClient.close();
     }
@@ -140,18 +157,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests a list of assigned roles of the user (defined by the
-     * credentials of this MeandreClient).
-     *
-     * @return a list of roles
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/about/user_roles.json
-     * @throws TransmissionException
-     *
-     * TODO: Need java object to represent valid roles
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveUserRoles()
      */
+    @Override
     public Set<String> retrieveUserRoles() throws TransmissionException {
         String reqPath = "/services/about/user_roles.json";
         JSONTokener jtRoles = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -170,17 +179,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the list of all valid roles the server supports. the roles
-     * are returned in their url form.
-     *
-     * this is equivalent to getValidRoles() in MeandreAdminClient, but
-     * this version requires only the 'about' role and not the 'admin'
-     * role to access it. Also, this returns the url representation of
-     * the roles, not Role objects.
-     *
-     * @return list of all valid roles
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveValidRoles()
      */
+    @Override
     public Set<String> retrieveValidRoles() throws TransmissionException {
         String reqPath = "/services/about/valid_roles.json";
         JSONTokener jtRoles = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -203,13 +205,10 @@ public class MeandreClient {
     //Locations (known peers of the server)
     //////////
 
-    /**
-     * requests the locations (urls) of all meandre repositories the server
-     * is aware of.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/locations/list.json
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveLocations()
      */
+    @Override
     public Set<LocationBean> retrieveLocations() throws TransmissionException {
         String reqPath = "/services/locations/list.json";
         JSONTokener jtLocs = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -230,16 +229,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * Adds or updates the location of a meandre server peer. returns true
-     * if the location is registered with the server after the call (whether
-     * it was added or was already present).
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/locations/add.json
-     *
-     * TODO: Handle possible bad_request errors in http response
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#addLocation(java.lang.String, java.lang.String)
      */
+    @Override
     public boolean addLocation(String locationUrl, String description) throws TransmissionException {
         String reqPath = "/services/locations/add.json";
 
@@ -263,15 +256,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * removes the input location from the server's list of peers. returns
-     * true if the location is not a peer after this method is called
-     * (regardless of whether this removed it or if it wasn't there in
-     * the first place).
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/locations/remove.json
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#removeLocation(java.lang.String)
      */
+    @Override
     public boolean removeLocation(String locationUrl) throws TransmissionException {
         String reqPath = "/services/locations/remove.json";
 
@@ -293,15 +281,10 @@ public class MeandreClient {
     //Repository
     /////////////
 
-    /**
-     * Locally recreates a Repository from the RDF model from the server.
-     * The contents of the repository are dependent on the user requesting
-     * it.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port/services/repository/dump.nt
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveRepository()
      */
+    @Override
     public QueryableRepository retrieveRepository() throws TransmissionException {
         String reqPath = "/services/repository/dump.nt";
         Model model = _httpClient.doGET(reqPath, null, RDFModelResponseHandler.getInstance());
@@ -309,13 +292,10 @@ public class MeandreClient {
         return new RepositoryImpl(model);
     }
 
-    /**
-     * Tells the server to rebuild it's repository by (re-)querying all
-     * of it's peers for information on available components and flows.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/regenerate.json
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#regenerate()
      */
+    @Override
     public boolean regenerate() throws TransmissionException {
         String reqPath = "/services/repository/regenerate.json";
         JSONTokener jt = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -331,13 +311,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the urls of all components in the server repository.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/list_components.json
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentUris()
      */
+    @Override
     public Set<URI> retrieveComponentUris() throws TransmissionException {
         String reqPath = "/services/repository/list_components.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -356,13 +333,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the urls of all flows in the server repository.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/list_flows.json
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowUris()
      */
+    @Override
     public Set<URI> retrieveFlowUris() throws TransmissionException {
         String reqPath = "/services/repository/list_flows.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -382,15 +356,10 @@ public class MeandreClient {
     }
 
 
-    /**
-     * requests all tags for any and all components and flows.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/tags.json
-     * @throws TransmissionException
-     *
-     * TODO:return tag objects instead of strings
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveAllTags()
      */
+    @Override
     public Set<String> retrieveAllTags() throws TransmissionException {
         String reqPath = "/services/repository/tags.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -409,14 +378,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests all tags for all components.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/tags_components.json
-     * @throws TransmissionException
-     * TODO:return tag objects instead of strings
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentTags()
      */
+    @Override
     public Set<String> retrieveComponentTags() throws TransmissionException {
         String reqPath = "/services/repository/tags_components.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -435,14 +400,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests all tags for all flows.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/tags_flows.json
-     * @throws TransmissionException
-     * TODO:return tag objects instead of strings
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowTags()
      */
+    @Override
     public Set<String> retrieveFlowTags() throws TransmissionException {
         String reqPath = "/services/repository/tags_flows.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -461,14 +422,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the urls of all components that have the input tag.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/components_by_tag.json
-     * @throws TransmissionException
-     * TODO:input a tag object instead of string
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentsByTag(java.lang.String)
      */
+    @Override
     public Set<URI> retrieveComponentsByTag(String tag) throws TransmissionException {
         String argPath = "/services/repository/components_by_tag.json";
         NameValuePair argTag = new BasicNameValuePair("tag", tag);
@@ -488,14 +445,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the urls of all flows that have the input tag.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/flows_by_tag.json
-     * @throws TransmissionException
-     * TODO:input a tag object instead of string
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowsByTag(java.lang.String)
      */
+    @Override
     public Set<URI> retrieveFlowsByTag(String tag) throws TransmissionException {
         String reqPath = "/services/repository/flows_by_tag.json";
         NameValuePair argTag = new BasicNameValuePair("tag", tag);
@@ -515,13 +468,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the component description model from the server.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/describe_component.nt
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentDescriptor(java.lang.String)
      */
+    @Override
     public ExecutableComponentDescription retrieveComponentDescriptor(String componentUri) throws TransmissionException {
         String reqPath = "/services/repository/describe_component.nt";
         NameValuePair argCompUri = new BasicNameValuePair("uri", componentUri);
@@ -538,13 +488,10 @@ public class MeandreClient {
         return comp;
     }
 
-    /**
-     * requests a flow description model from the server.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/describe_flow.nt
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowDescriptor(java.lang.String)
      */
+    @Override
     public FlowDescription retrieveFlowDescriptor(String flowUri) throws TransmissionException {
         String reqPath = "/services/repository/describe_flow.nt";
         NameValuePair argFlowUri = new BasicNameValuePair("uri", flowUri);
@@ -561,14 +508,10 @@ public class MeandreClient {
         return flow;
     }
 
-    /**
-     *TODO: need serious docs on this or a query object to input instead of
-     * a string.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/search_components.json
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentUrlsByQuery(java.lang.String)
      */
+    @Override
     public Set<URI> retrieveComponentUrlsByQuery(String query) throws TransmissionException {
         String reqPath = "/services/repository/search_components.json";
         NameValuePair argQuery = new BasicNameValuePair("q", query);
@@ -588,14 +531,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * TODO: need serious docs on this or a query object to input instead of
-     * a string.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/search_flows.json
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowUrlsByQuery(java.lang.String)
      */
+    @Override
     public Set<URI> retrieveFlowUrlsByQuery(String query) throws TransmissionException {
         String reqPath = "/services/repository/search_flows.json";
         NameValuePair argQuery = new BasicNameValuePair("q", query);
@@ -615,24 +554,18 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * uploads a single flow to the server.
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     *
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadFlow(org.meandre.core.repository.FlowDescription, boolean)
      */
+    @Override
     public boolean uploadFlow(FlowDescription flow, boolean overwrite) throws TransmissionException {
         return uploadModel(flow.getModel(), null, overwrite);
     }
 
-    /**
-     * uploads a set of flows to the server.
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadFlowBatch(java.util.Set, boolean)
      */
+    @Override
     public boolean uploadFlowBatch(Set<FlowDescription> flows, boolean overwrite) throws TransmissionException {
         HashSet<Model> hsFlowModels = new HashSet<Model>();
         Iterator<FlowDescription> flowIter = flows.iterator();
@@ -642,24 +575,18 @@ public class MeandreClient {
         return uploadModelBatch(hsFlowModels, null, overwrite);
     }
 
-    /**
-     * uploads a single component to the server.
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     *
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadComponent(org.meandre.core.repository.ExecutableComponentDescription, java.util.Set, boolean)
      */
+    @Override
     public boolean uploadComponent(ExecutableComponentDescription component, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         return uploadModel(component.getModel(), jarFileContexts, overwrite);
     }
 
-    /**
-     * uploads a set of flows to the server.
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadComponentBatch(java.util.Set, java.util.Set, boolean)
      */
+    @Override
     public boolean uploadComponentBatch(Set<ExecutableComponentDescription> components, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         HashSet<Model> hsComponentModels = new HashSet<Model>();
         Iterator<ExecutableComponentDescription> compIter = components.iterator();
@@ -669,16 +596,10 @@ public class MeandreClient {
         return uploadModelBatch(hsComponentModels, jarFileContexts, overwrite);
     }
 
-    /**
-     * uploads all resources of a repository to a server, merging it with
-     * the server's repository.
-     *
-     * the jar files set may be null.
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadRepository(org.meandre.core.repository.QueryableRepository, java.util.Set, boolean)
      */
+    @Override
     public boolean uploadRepository(QueryableRepository qr, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         return uploadModel(qr.getModel(), jarFileContexts, overwrite);
     }
@@ -699,17 +620,10 @@ public class MeandreClient {
         return uploadModelBatch(modSet, jarFileContexts, overwrite);
     }
 
-    /**
-     * uploads a set of component or flow resources and any jar files.
-     * the jarfiles set may be null.
-     *
-     * Note: this is the main upload function that actually does the
-     * upload. all other upload* methods call this.
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadModelBatch(java.util.Set, java.util.Set, boolean)
      */
+    @Override
     public boolean uploadModelBatch(Set<Model> resModels, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         String reqPath = "/services/repository/add.json";
 
@@ -741,18 +655,10 @@ public class MeandreClient {
         return true;
     }
 
-    /**
-     * Uploads a set of jar files to the resources directory of the server.
-     * For instance, jar files required by an applet that a component
-     * uses in it's web UI, which are not uploaded with the component itself
-     * because the component has no direct dependency on them, would be
-     * uploaded via this method and then be available to the applet.
-     *
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/repository/add.nt
-     * TODO:Need test
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#uploadFiles(java.util.Set, boolean)
      */
+    @Override
     public boolean uploadFiles(Set<File> files, boolean overwrite) throws TransmissionException {
         //just use the regular uploader with no models
         Set<Model> emptyModelSet = new HashSet<Model>(0);
@@ -760,15 +666,10 @@ public class MeandreClient {
         return uploadModelBatch(emptyModelSet, files, overwrite);
     }
 
-    /**
-     *removes (deletes) either a component or flow from the server. returns
-     *true if the resource was deleted.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/repository/remove.json
-     * TODO: need more specific error reporting when the server returns an empty
-     * json string
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#removeResource(java.lang.String)
      */
+    @Override
     public boolean removeResource(String resourceUri) throws TransmissionException{
         String reqPath = "/services/repository/remove.json";
         NameValuePair argRes = new BasicNameValuePair("uri", resourceUri);
@@ -791,14 +692,10 @@ public class MeandreClient {
     //Publish
     /////////
 
-    /**
-     * commands the server to change a component or flow's status to "published."
-     * returns true if the resource is in a state of "published" after this
-     * method returns.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/publish/publish.json
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#publish(java.lang.String)
      */
+    @Override
     public boolean publish(String resourceUri) throws TransmissionException {
         String reqPath = "/services/publish/publish.json";
         NameValuePair argRes = new BasicNameValuePair("uri", resourceUri);
@@ -814,19 +711,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * commands the server to change a component or flow's status to
-     * "not published."
-     *
-     * returns true no matter what as long as the server received and understood
-     * the request.
-     *
-     * TODO: modify so returns true if the resource is not in a state of
-     * "published" after this method returns.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/publish/unpublish.json
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#unpublish(java.lang.String)
      */
+    @Override
     public boolean unpublish(String resourceUri) throws TransmissionException {
         String reqPath = "/services/publish/unpublish.json";
         NameValuePair argRes = new BasicNameValuePair("uri", resourceUri);
@@ -846,17 +734,10 @@ public class MeandreClient {
     //Execution
     ///////////
 
-    /**
-     * commands the server to run the flow with the given url-name. the returned
-     * string is a human readable printout of stdout from the components in the
-     * flow and (optionally, if verbose=true) statistics about the flow run.
-     *
-     * This method currently blocks waiting for flow to complete -> it does
-     * not return the result string until the flow has completely finished.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/execute/flow.txt
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#runFlow(java.lang.String, boolean)
      */
+    @Override
     public String runFlow(String flowUri, boolean verbose) throws TransmissionException {
         String reqPath = "/services/execute/flow.txt";
         
@@ -890,13 +771,10 @@ public class MeandreClient {
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance(), nvps.toArray(args));
     }
 
-    /**
-     * This method uploads and executes all the flows in the provided model
-     *
-     * <p> calls:
-     * http://<meandre_host>:<meandre_port>/services/execute/repository.txt
-     * TODO:Need test
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#runRepository(com.hp.hpl.jena.rdf.model.Model)
      */
+    @Override
     public String runRepository(Model model) throws TransmissionException {
         String reqPath = "/services/execute/repository.txt";
         List<KeyValuePair<String, ContentBody>> parts = new ArrayList<KeyValuePair<String,ContentBody>>();
@@ -911,21 +789,18 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * commands the server to run the flow with the given url-name. the returned
-     * string is a human readable printout of stdout from the components in the
-     * flow and (optionally, if verbose=true) statistics about the flow run.
-     *
-     * This method currently blocks waiting for flow to complete -> it does
-     * not return the result string until the flow has completely finished.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/services/execute/flow.txt
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#runFlowStreamOutput(java.lang.String, boolean)
      */
+    @Override
     public InputStream runFlowStreamOutput(String flowUri, boolean verbose) throws TransmissionException {
         return runFlowStreamOutput(flowUri, null, verbose);
     }
 
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#runFlowStreamOutput(java.lang.String, java.lang.String, boolean)
+     */
+    @Override
     public InputStream runFlowStreamOutput(String flowUri, String token, boolean verbose) throws TransmissionException {
         String reqPath = "/services/execute/flow.txt";
         
@@ -940,20 +815,10 @@ public class MeandreClient {
         return _httpClient.doGET(reqPath, null, nvps.toArray(args));
     }
 
-    /**
-     * Retrieves the WebUI information for the flow referenced by 'token'
-     * Example of WebUI information returned:
-     *          port=1716
-     *          hostname=192.168.0.2
-     *          token=1213938009687
-     *          uri=meandre://test.org/flow/webmonkflow/1213938147793/1565344277
-     *
-     * Note: Not yet unit tested
-     *
-     * @param token The token of the flow to return the WebUI information for
-     * @return  A JSONObject containing the WebUI information
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveWebUIInfo(java.lang.String)
      */
+    @Override
     public JSONObject retrieveWebUIInfo(String token) throws TransmissionException {
         String reqPath = "/services/execute/uri_flow.txt";
         NameValuePair argToken = new BasicNameValuePair("token", token);
@@ -1056,18 +921,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * returns the job statuses.
-     *
-     * @return a vector of maps where the keys are status information keys.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/jobs/list_jobs_statuses.json
-     *TODO: need to reverse the order in the map so that the always unique
-     * webui_url is the key and the not-always-unique flow intance url is
-     * the value. requires a server side change.
-     * FIXME: This is totally untested.
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveJobStatuses()
      */
+    @Override
     public Vector<Map<String,String>> retrieveJobStatuses() throws TransmissionException {
         String reqPath = "/services/jobs/list_jobs_statuses.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
@@ -1093,19 +950,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * returns the job console.
-     *
-     * @param sFUID The flow ID
-     * @return a string with the console for the given string.
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/services/jobs/job_console.json
-     *TODO: need to reverse the order in the map so that the always unique
-     * webui_url is the key and the not-always-unique flow intance url is
-     * the value. requires a server side change.
-     * FIXME: This is totally untested.
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveJobConsole(java.lang.String)
      */
+    @Override
     public String retrieveJobConsole(String sFUID) throws TransmissionException{
         String reqPath = "/services/jobs/job_console.json";
         NameValuePair argUri = new BasicNameValuePair("uri", sFUID);
@@ -1125,14 +973,10 @@ public class MeandreClient {
     //Public
     //////////////
 
-    /**
-     * retrieves the public repository of published resources. does not
-     * require authorization.
-     *
-     *<p> calls:
-     * http://<meandre_host>:<meandre_port>/public/services/repository.nt
-     * @throws TransmissionException
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrievePublicRepository()
      */
+    @Override
     public QueryableRepository retrievePublicRepository() throws TransmissionException {
         String reqPath = "/public/services/repository.nt";
         InputStream modelStream = _httpClient.doGET(reqPath, null);
@@ -1143,13 +987,10 @@ public class MeandreClient {
         return new RepositoryImpl(model);
     }
 
-    /**
-     * retrieves the demo repository of published resources. does not
-     * require authorization
-     *
-     *<p> calls:
-     *http://<meandre_host>:<meandre_port>/public/services/demo_repository.nt
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveDemoRepository()
      */
+    @Override
     public QueryableRepository retrieveDemoRepository() throws TransmissionException {
         String reqPath = "/public/services/demo_repository.nt";
         InputStream modelStream = _httpClient.doGET(reqPath, null);
@@ -1164,21 +1005,10 @@ public class MeandreClient {
     //Admin of Running Flows
     ////////////////////////
 
-    /**
-     * commands the WEBUI of a flow abort a running flow. the currently running
-     * component will be allowed to complete but no other components in the
-     * active flow will fire. the flow is specified by the port on the server that
-     * it's webui is running on.
-     *
-     * if this method returns true, it simply means that the abort
-     * request was received by the server, it does not necessarily mean
-     * that the currently running component(s) are no longer running.
-     *
-     *
-     *<p> calls:
-     *http://<meandre_host>:<webui_port>/admin/abort.txt
-     * FIXME: This is totally untested.
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#abortFlow(int)
      */
+    @Override
     public boolean abortFlow(int webUIPort) throws TransmissionException {
         String reqPath = "/admin/abort.txt";
         String sExpected = "Abort request dispatched..."; 
@@ -1194,22 +1024,10 @@ public class MeandreClient {
         }
     }
 
-    /**
-     * requests the current statistics of the currently running flow from
-     * the WEBUI. the flow is specified by the port on the server that
-     * it's webui is running on.
-     *
-     * the returned json data is in the format produced by
-     * StatisticsProbeImpl.getSerializedStatistics()
-     *
-     * *<p> calls:
-     * http://<meandre_host>:<webui_port>/admin/statistics.json
-     *
-     * TODO: refactor StatisticsProbeImpl so that a RunningFlowStatistics
-     * "bean" can be read and written to/from json, and StatisticsProbeImpl
-     * simply constructs the bean.
-     * FIXME: This is totally untested.
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#retrieveRunningFlowStatisitics(int)
      */
+    @Override
     public JSONObject retrieveRunningFlowStatisitics(int webUIPort) throws TransmissionException {
         String reqPath = "/admin/statistics.json";
 
@@ -1244,12 +1062,10 @@ public class MeandreClient {
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance(), argCompUri);
     }
 
-    /** 
-     * Gets the server version.
-     *
-     * @return The server version
-     * @throws TransmissionException Could not get the server version
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#getServerVersion()
      */
+    @Override
     public String getServerVersion() throws TransmissionException {
         String reqPath = "/services/about/version.txt";
         
@@ -1281,14 +1097,23 @@ public class MeandreClient {
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance());
     }
 
-    /** 
-     * Pings the server
-     *
-     *	@return True if it successfully pinged the server
+    /* (non-Javadoc)
+     * @see org.meandre.client.v1.IMeandreClient#ping()
      */
+    @Override
     public boolean ping() throws TransmissionException {
         String reqPath = "/public/services/ping.txt";
         
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance()) != null;
+    }
+
+    @Override
+    public String getHostName() {
+        return _httpClient.getHost().getHostName();
+    }
+
+    @Override
+    public int getPort() {
+        return _httpClient.getHost().getPort();
     }
 }

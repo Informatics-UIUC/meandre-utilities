@@ -50,8 +50,8 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.meandre.client.AbstractMeandreClient;
 import org.meandre.client.exceptions.TransmissionException;
-import org.meandre.client.v1.MeandreClient;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
@@ -136,7 +136,7 @@ public class RDF2ZZMain {
             if (server == null)
                 parseArguments(new String[] { "--help" });
 
-            MeandreClient client = new MeandreClient(server, port);
+            AbstractMeandreClient client = AbstractMeandreClient.getClientForServer(server, port);
             client.setLogger(_logger);
             if (user != null && password != null) {
                 client.setCredentials(user, password);
