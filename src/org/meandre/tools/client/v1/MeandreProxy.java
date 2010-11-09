@@ -3,7 +3,7 @@
  * Meandre Repository.
  */
 
-package org.meandre.client.v1;
+package org.meandre.tools.client.v1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -15,11 +15,11 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
-import org.meandre.client.exceptions.TransmissionException;
-import org.meandre.client.utils.ClientLoggerFactory;
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.tools.client.exceptions.TransmissionException;
+import org.meandre.tools.client.utils.ClientLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

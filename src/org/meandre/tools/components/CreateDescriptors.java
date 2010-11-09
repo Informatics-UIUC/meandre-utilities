@@ -40,7 +40,7 @@
  * WITH THE SOFTWARE.
  */
 
-package org.meandre.components.tools;
+package org.meandre.tools.components;
 
 import java.io.File;
 import java.io.FileFilter;

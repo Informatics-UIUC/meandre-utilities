@@ -40,7 +40,7 @@
  * WITH THE SOFTWARE.
  */
 
-package org.meandre.zigzag.transformations;
+package org.meandre.tools.zigzag.transformations;
 
 /**
  * @author Boris Capitanu

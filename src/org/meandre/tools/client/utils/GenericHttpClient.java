@@ -1,4 +1,4 @@
-package org.meandre.client.utils;
+package org.meandre.tools.client.utils;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -43,7 +43,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
-import org.meandre.client.exceptions.TransmissionException;
+import org.meandre.tools.client.exceptions.TransmissionException;
 import org.seasr.meandre.support.generic.util.KeyValuePair;
 
 /**

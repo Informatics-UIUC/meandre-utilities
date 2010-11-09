@@ -1,4 +1,4 @@
-package org.meandre.client.v1;
+package org.meandre.tools.client.v1;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,18 +28,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.meandre.client.AbstractMeandreClient;
-import org.meandre.client.exceptions.TransmissionException;
-import org.meandre.client.utils.ClientLoggerFactory;
-import org.meandre.client.utils.GenericHttpClient;
-import org.meandre.client.utils.handlers.JSONResponseHandler;
-import org.meandre.client.utils.handlers.RDFModelResponseHandler;
-import org.meandre.client.utils.handlers.StringResponseHandler;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.tools.client.AbstractMeandreClient;
+import org.meandre.tools.client.exceptions.TransmissionException;
+import org.meandre.tools.client.utils.ClientLoggerFactory;
+import org.meandre.tools.client.utils.GenericHttpClient;
+import org.meandre.tools.client.utils.handlers.JSONResponseHandler;
+import org.meandre.tools.client.utils.handlers.RDFModelResponseHandler;
+import org.meandre.tools.client.utils.handlers.StringResponseHandler;
 import org.seasr.meandre.support.generic.io.ModelUtils;
 import org.seasr.meandre.support.generic.util.KeyValuePair;
 

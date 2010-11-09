@@ -1,4 +1,4 @@
-package org.meandre.client.utils;
+package org.meandre.tools.client.utils;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;

@@ -1,4 +1,4 @@
-package org.meandre.client.exceptions;
+package org.meandre.tools.client.exceptions;
 
 /**
  * An exception that is thrown when there is a problem communicating with

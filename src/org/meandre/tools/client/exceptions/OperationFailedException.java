@@ -1,4 +1,4 @@
-package org.meandre.client.exceptions;
+package org.meandre.tools.client.exceptions;
 
 import org.json.JSONObject;
 

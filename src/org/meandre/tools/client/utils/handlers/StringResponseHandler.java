@@ -1,4 +1,4 @@
-package org.meandre.client.utils.handlers;
+package org.meandre.tools.client.utils.handlers;
 
 import org.apache.http.impl.client.BasicResponseHandler;
 

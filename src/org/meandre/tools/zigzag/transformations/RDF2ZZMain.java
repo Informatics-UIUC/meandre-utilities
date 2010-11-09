@@ -40,7 +40,7 @@
  * WITH THE SOFTWARE.
  */
 
-package org.meandre.zigzag.transformations;
+package org.meandre.tools.zigzag.transformations;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,11 +50,11 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.meandre.client.AbstractMeandreClient;
-import org.meandre.client.exceptions.TransmissionException;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
+import org.meandre.tools.client.AbstractMeandreClient;
+import org.meandre.tools.client.exceptions.TransmissionException;
 import org.seasr.meandre.support.generic.io.ModelUtils;
 
 import com.hp.hpl.jena.rdf.model.Model;

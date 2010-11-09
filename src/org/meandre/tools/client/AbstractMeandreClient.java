@@ -1,4 +1,4 @@
-package org.meandre.client;
+package org.meandre.tools.client;
 
 import java.io.File;
 import java.io.InputStream;
@@ -12,11 +12,11 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
-import org.meandre.client.exceptions.TransmissionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
+import org.meandre.tools.client.exceptions.TransmissionException;
 import org.seasr.meandre.support.generic.io.IOUtils;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -501,14 +501,14 @@ public abstract class AbstractMeandreClient {
             JSONObject joVersion = new JSONObject(ver);
             
             if (joVersion.getString("version").startsWith("1.4"))
-                client = new org.meandre.client.v1.MeandreClient(hostName, port);
+                client = new org.meandre.tools.client.v1.MeandreClient(hostName, port);
 
             if (joVersion.getString("version").startsWith("2.0"))
-                client = new org.meandre.client.v2.MeandreClient(hostName, port);
+                client = new org.meandre.tools.client.v2.MeandreClient(hostName, port);
         }
         catch (Exception e) {
             // Assume 2.0
-            client = new org.meandre.client.v2.MeandreClient(hostName, port);
+            client = new org.meandre.tools.client.v2.MeandreClient(hostName, port);
         }
         
         if (client != null && userName != null)

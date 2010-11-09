@@ -1,4 +1,4 @@
-package org.meandre.client.utils.handlers;
+package org.meandre.tools.client.utils.handlers;
 
 import java.io.IOException;
 

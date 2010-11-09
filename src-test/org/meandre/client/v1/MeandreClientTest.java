@@ -23,7 +23,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.meandre.client.exceptions.TransmissionException;
 import org.meandre.core.repository.ExecutableComponentDescription;
 import org.meandre.core.repository.FlowDescription;
 import org.meandre.core.repository.LocationBean;
@@ -31,6 +30,8 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.core.security.Role;
 import org.meandre.demo.repository.DemoRepositoryGenerator;
+import org.meandre.tools.client.exceptions.TransmissionException;
+import org.meandre.tools.client.v1.MeandreClient;
 import org.meandre.webservices.MeandreServer;
 import org.seasr.meandre.support.generic.util.NetUtils;
 
@@ -146,7 +147,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveInstallationProperties()}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveInstallationProperties()}.
      */
     @Test
     public void testRetrieveInstallationProperties() {
@@ -162,7 +163,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveRoles()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveRoles()}.
      */
     @Test
     public void testRetrieveUserRoles() {
@@ -182,7 +183,7 @@ public class MeandreClientTest {
     }
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveValidRoles()}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveValidRoles()}.
      */
     @Test
     public void testRetrieveValidRoles() {
@@ -203,7 +204,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveLocations()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveLocations()}.
      */
     @Test
     public void testRetrieveLocations() {
@@ -235,7 +236,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#addLocation(java.lang.String, 
+     * {@link org.meandre.tools.client.v1.MeandreClient#addLocation(java.lang.String, 
      * java.lang.String)}.
      */
     @Test
@@ -257,7 +258,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#removeLocation(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#removeLocation(java.lang.String)}.
      */
     @Test
     public void testRemoveLocation() {
@@ -275,7 +276,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveRepository()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveRepository()}.
      */
     @Test
     public void testRetrieveRepository() {
@@ -298,7 +299,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#regenerate()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#regenerate()}.
      */
     @Test
     public void testRegenerate() {
@@ -312,7 +313,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveComponentUrls()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveComponentUrls()}.
      */
     @Test
     public void testRetrieveComponentUris() {
@@ -338,7 +339,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveFlowUrls()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveFlowUrls()}.
      * 
      *
      */
@@ -361,7 +362,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveAllTags()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveAllTags()}.
      */
     @Test
     public void testRetrieveAllTags() {
@@ -378,7 +379,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveComponentTags()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveComponentTags()}.
      */
     @Test
     public void testRetrieveComponentTags() {
@@ -395,7 +396,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveFlowTags()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveFlowTags()}.
      */
     @Test
     public void testRetrieveFlowTags() {
@@ -413,7 +414,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveComponentsByTag(
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveComponentsByTag(
      * java.lang.String)}.
      */
     @Test
@@ -447,7 +448,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveFlowsByTag(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveFlowsByTag(java.lang.String)}.
      */
     @Test
     public void testRetrieveFlowsByTag() {
@@ -474,7 +475,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveComponentDescriptor(
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveComponentDescriptor(
      * java.lang.String)}.
      */
     @Test
@@ -491,7 +492,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveFlowDescriptor(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveFlowDescriptor(java.lang.String)}.
      */
     @Test
     public void testRetrieveFlowDescriptor() {
@@ -528,7 +529,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#upload(byte[][], 
+     * {@link org.meandre.tools.client.v1.MeandreClient#upload(byte[][], 
      * boolean, boolean, com.hp.hpl.jena.rdf.model.Model)}.
      */
     @Test
@@ -562,7 +563,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#uploadFlow(FlowDescription, boolean)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#uploadFlow(FlowDescription, boolean)}.
      */
     @Test
     public void testUploadFlow() {
@@ -618,7 +619,7 @@ public class MeandreClientTest {
     }
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#remove(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#remove(java.lang.String)}.
      */
     @Test
     public void testRemove() {
@@ -653,7 +654,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#publish(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#publish(java.lang.String)}.
      */
     @Test
     public void testPublish() {
@@ -671,7 +672,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#unpublish(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#unpublish(java.lang.String)}.
      */
     @Test
     public void testUnpublish() {
@@ -691,7 +692,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#runFlow(java.lang.String)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#runFlow(java.lang.String)}.
      */
     @Test
     public void testRunFlow() {
@@ -714,7 +715,7 @@ public class MeandreClientTest {
     
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#runFlow(java.lang.String, java.util.HashMap)}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#runFlow(java.lang.String, java.util.HashMap)}.
      */
     @Test
     public void testRunFlowWithProbes() {
@@ -739,7 +740,7 @@ public class MeandreClientTest {
     
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#
+     * {@link org.meandre.tools.client.v1.MeandreClient#
      *      runFlowStreamOutput(java.lang.String)}.
      */
     @Test
@@ -770,7 +771,7 @@ public class MeandreClientTest {
     }
     /**
      * Test method for {@link 
-     * org.meandre.client.v1.MeandreClient#retrieveRunningFlows()}.
+     * org.meandre.tools.client.v1.MeandreClient#retrieveRunningFlows()}.
      */
     @Test
     public void testRetrieveRunningFlows() {
@@ -779,7 +780,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrievePublicRepository()}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrievePublicRepository()}.
      */
     @Test
     public void testRetrievePublicRepository() {
@@ -794,7 +795,7 @@ public class MeandreClientTest {
     }
 
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#retrieveDemoRepository()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#retrieveDemoRepository()}.
      */
     @Test
     public void testRetrieveDemoRepository() {
@@ -827,7 +828,7 @@ public class MeandreClientTest {
         return;
     }
     /**
-     * Test method for {@link org.meandre.client.v1.MeandreClient#abortFlow()}.
+     * Test method for {@link org.meandre.tools.client.v1.MeandreClient#abortFlow()}.
      */
     @Test
     public void testAbortFlow() {
@@ -836,7 +837,7 @@ public class MeandreClientTest {
 
     /**
      * Test method for 
-     * {@link org.meandre.client.v1.MeandreClient#retrieveRunningFlowStatisitics()}.
+     * {@link org.meandre.tools.client.v1.MeandreClient#retrieveRunningFlowStatisitics()}.
      */
     @Test
     public void testRetrieveRunningFlowStatisitics() {
