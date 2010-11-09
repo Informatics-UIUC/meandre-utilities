@@ -44,6 +44,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.meandre.client.exceptions.TransmissionException;
+import org.seasr.meandre.support.generic.util.KeyValuePair;
 
 /**
  * 

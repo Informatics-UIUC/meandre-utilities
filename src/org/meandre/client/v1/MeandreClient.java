@@ -32,7 +32,6 @@ import org.meandre.client.AbstractMeandreClient;
 import org.meandre.client.exceptions.TransmissionException;
 import org.meandre.client.utils.ClientLoggerFactory;
 import org.meandre.client.utils.GenericHttpClient;
-import org.meandre.client.utils.KeyValuePair;
 import org.meandre.client.utils.handlers.JSONResponseHandler;
 import org.meandre.client.utils.handlers.RDFModelResponseHandler;
 import org.meandre.client.utils.handlers.StringResponseHandler;
@@ -42,6 +41,7 @@ import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.seasr.meandre.support.generic.io.ModelUtils;
+import org.seasr.meandre.support.generic.util.KeyValuePair;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
