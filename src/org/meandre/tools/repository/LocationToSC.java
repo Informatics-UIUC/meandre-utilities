@@ -1,6 +1,8 @@
 package org.meandre.tools.repository;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +36,9 @@ import com.martiansoftware.jsap.SimpleJSAP;
 import com.martiansoftware.jsap.Switch;
 import com.martiansoftware.jsap.defaultsources.PropertyDefaultSource;
 
-import de.schlichtherle.io.FileReader;
-
+/**
+ * @author Boris Capitanu
+ */
 public class LocationToSC {
 
     private static final Logger _logger = Logger.getLogger("LocationToSC");
@@ -173,7 +176,7 @@ public class LocationToSC {
     }
 
     private static String[] readFile(String fileName) throws FileNotFoundException, IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))));
         String line = null;
         Set<String> setLines = new HashSet<String>();
         while ((line = reader.readLine()) != null) {
