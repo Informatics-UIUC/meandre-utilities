@@ -245,7 +245,7 @@
 				<attribute name="Built-By" value="${user.name}"/>
 				<attribute name="Main-Class" value="org.meandre.tools.zigzag.transformations.RDF2ZZMain"/>
 			</manifest>
-			
+
 			<fileset dir="${build.dir}">
 				<include name="org/meandre/tools/zigzag/transformations/**"/>
 				<include name="org/meandre/tools/Version.class"/>
@@ -253,6 +253,31 @@
 
 			<zipgroupfileset dir="${dist.dir}" includes="meandre-client-deps-${version}.jar"/>
 			<zipgroupfileset dir="${lib.dir}" includes="jsap*.jar"/>
+		</jar>
+
+		<jar destfile="${dist.dir}/create-wiki-component-pages-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/wiki/**">
+			<manifest>
+				<attribute name="Implementation-Title" value="Create Confluence Wiki Component Pages"/>
+				<attribute name="Implementation-Version" value="${version}.${revision}"/>
+				<attribute name="Implementation-Vendor" value="NCSA/ALG"/>
+				<attribute name="Build-Date" value="${TIMESTAMP}"/>
+				<attribute name="Built-By" value="${user.name}"/>
+				<attribute name="Main-Class" value="org.meandre.tools.wiki.WikiCreateComponentPages"/>
+			</manifest>
+
+			<zipgroupfileset dir="${lib.dir}">
+				<include name="meandre-kernel*.jar"/>
+				<include name="jena*.jar"/>
+				<include name="icu4j*.jar"/>
+				<include name="iri*.jar"/>
+				<include name="log4j*.jar"/>
+				<include name="slf4j-api*.jar"/>
+				<include name="slf4j-log4j12*.jar"/>
+				<include name="xercesImpl*.jar"/>
+				<include name="jsap*.jar"/>
+			    <include name="axis*.jar"/>
+				<include name="confluence-soap*.jar"/>
+			</zipgroupfileset>
 		</jar>
 	</target>
 
