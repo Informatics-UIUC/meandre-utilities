@@ -88,6 +88,7 @@ public class ComponentJarBuilder {
     }
 
     
+    @SuppressWarnings("unused")
     private void log(String msg){
         System.out.println("ComponentJarBuilder: " + msg);
     }

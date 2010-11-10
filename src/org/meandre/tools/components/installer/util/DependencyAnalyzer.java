@@ -1,6 +1,7 @@
 package org.meandre.tools.components.installer.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,6 +75,13 @@ public class DependencyAnalyzer {
      */
     public DependencyAnalyzer(File jarDir, File classDir) throws IOException {
         this();
+        
+        if (!jarDir.exists())
+            throw new FileNotFoundException(jarDir.toString());
+        
+        if (!classDir.exists())
+            throw new FileNotFoundException(classDir.toString());
+        
         addClassToClassDeps(classDir);
         addClassToJarDeps(classDir, jarDir);
         addJarToJarDeps(jarDir);

@@ -11,19 +11,19 @@ import java.io.IOException;
 
 public class SourceUtil{
 
-    public static Class sourceFileToClass(File sourceFile,
-    		File sourceFileDir) throws ClassNotFoundException, IOException{
+    public static Class<?> sourceFileToClass(File sourceFile,
+    		File sourceFileDir, ClassLoader loader) throws ClassNotFoundException, IOException{
 
         String className = sourceFileToClassName(sourceFile, sourceFileDir);
         System.out.println("className is: " + className);
-        Class klass = Class.forName(className);
+        Class<?> klass = Class.forName(className, true, loader);
         return klass;
     }
     
     public static File sourceFileToClassFile(File sourceFile, 
-    		File sourceFileDir, File classFileDir) 
+    		File sourceFileDir, File classFileDir, ClassLoader loader) 
     		throws ClassNotFoundException, IOException{
-    	Class klass = sourceFileToClass(sourceFile, sourceFileDir);
+    	Class<?> klass = sourceFileToClass(sourceFile, sourceFileDir, loader);
     	File classFile = classToClassFile(klass, classFileDir);
     	return classFile;
     }
@@ -108,19 +108,19 @@ public class SourceUtil{
 
     }
 
-    public static Class classNameToClass(String className) 
+    public static Class<?> classNameToClass(String className, ClassLoader loader) 
     		throws ClassNotFoundException{
-		Class klass = Class.forName(className);
+		Class<?> klass = Class.forName(className, true, loader);
     	return klass;
 	}
 
-	public static File classToClassFile(Class klass, File classesDir) {
+	public static File classToClassFile(Class<?> klass, File classesDir) {
 		String className = classToClassName(klass);
 		File classFile = classNameToClassFile(className, classesDir);
 		return classFile;
 	}
 
-	public static String classToClassName(Class klass) {
+	public static String classToClassName(Class<?> klass) {
 		String className = klass.getName();
 		return className;
 	}

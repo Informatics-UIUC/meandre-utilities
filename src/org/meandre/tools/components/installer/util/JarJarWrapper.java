@@ -142,6 +142,7 @@ public class JarJarWrapper {
     /**
      * convert a Set of strings that are filenames to a set of File objects
      */
+    @SuppressWarnings("unused")
     private static Set<File> fileNameSetToFileSet(Set<String> fileNames) {
         Set<File> files = new HashSet<File>();
         for (String fileName : fileNames) {
@@ -234,6 +235,7 @@ public class JarJarWrapper {
             return _handledJars;
         }
 
+        @SuppressWarnings("unused")
         public void reset() {
             _handledJars.clear();
         }

@@ -1,11 +1,16 @@
 package org.meandre.tools.components.installer;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.meandre.core.repository.CorruptedDescriptionException;
@@ -17,6 +22,7 @@ import org.meandre.tools.components.installer.util.DependencyAnalyzer;
 import org.meandre.tools.components.installer.util.FileTreeIterator;
 import org.meandre.tools.components.installer.util.FileUtil;
 import org.meandre.tools.components.installer.util.SourceUtil;
+import org.seasr.meandre.support.generic.io.FileUtils;
 
 /**
  * ComponentInstaller performs all necessary steps to upload a working Meandre
@@ -42,6 +48,8 @@ public class ComponentInstaller {
     File _jarOutputDir;
 
     AbstractMeandreClient _mClient;
+    
+    final URLClassLoader loader;
 
     ComponentJarBuilder _compJarBuilder;
     AppletJarBuilder _appletJarBuilder;
@@ -91,6 +99,23 @@ public class ComponentInstaller {
         // setupWorkingDir();
         _compJarBuilder = new ComponentJarBuilder(_classDir, _jarOutputDir, _depFinder);
         _appletJarBuilder = new AppletJarBuilder(_classDir, _jarOutputDir, _depFinder);
+        
+        List<File> classPath = new ArrayList<File>();
+        classPath.add(classesDir);
+        FileUtils.findFiles(jarLibDir, new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return isJarFile(name);
+            }
+        }, true, classPath);
+        
+        URL[] classUrls = new URL[classPath.size()];
+        for (int i = 0, iMax = classPath.size(); i < iMax; i++) {
+            File file = classPath.get(i);
+            classUrls[i] = isJarFile(file.getName()) ? 
+                    new URL(String.format("jar:%s!/", file.toURL().toString())) : file.toURL();
+        }
+        
+        loader = new URLClassLoader(classUrls);
     }
 
     public void installComponent(String componentClassName) throws IOException, ClassNotFoundException, CorruptedDescriptionException,
@@ -101,13 +126,13 @@ public class ComponentInstaller {
         // make rdf descriptor, write it to file
         //
         logInfo("\tReading Annotations");
-        Class componentKlass = SourceUtil.classNameToClass(componentClassName);
+        Class<?> componentKlass = SourceUtil.classNameToClass(componentClassName, loader);
         ComponentSourceDescriptor compDescriptor = new ComponentSourceDescriptor(componentKlass);
         // for now, don't write the file out as we aren't doing caching yet
         // TODO: write the rdf to file to cache between installer runs.
         // File rdfFile = compDescriptor.writeRDFToDir(_rdfOutputDir);
 
-        // start aggegrating the jar files to upload for this component to work
+        // start aggregating the jar files to upload for this component to work
         Set<File> jarFilesToUpload = new HashSet<File>();
 
         logInfo("\tBuilding Component Jar File");
@@ -121,7 +146,13 @@ public class ComponentInstaller {
         // files it needs
         Set<File> classDeps = _depFinder.getDeepClassDeps(compClassFile);
         Set<File> libJarDeps = _depFinder.getDeepJarDeps(classDeps);
-        jarFilesToUpload.addAll(libJarDeps);
+        // Remove any JARs that are part of the Meandre server (and shouldn't be uploaded)
+        for (File jarFile : libJarDeps) {
+            String jarName = jarFile.getName().toLowerCase();
+            if (jarName.startsWith("meandre-")) continue;
+            jarFilesToUpload.add(jarFile);
+        }
+        
 
         // include any jars specified explicitly in the component annotations
         // that may not have been picked up by the DependencyAnalyzer
@@ -152,12 +183,11 @@ public class ComponentInstaller {
     public void uninstallComponent(String componentClassName) throws IOException, ClassNotFoundException, CorruptedDescriptionException,
             TransmissionException, URISyntaxException {
 
-        Class componentKlass = SourceUtil.classNameToClass(componentClassName);
+        Class<?> componentKlass = SourceUtil.classNameToClass(componentClassName, loader);
         ComponentSourceDescriptor compDescriptor = new ComponentSourceDescriptor(componentKlass);
         // to delete from a server, we just need to pass the url identifier
         URI compUrl = compDescriptor.getURI();
         _mClient.removeResource(compUrl.toString());
-
     }
 
     /**
@@ -203,6 +233,7 @@ public class ComponentInstaller {
         return appletJars;
     }
 
+    @SuppressWarnings("unused")
     private static void logWarn(String str) {
         System.out.println(str);
 
@@ -273,13 +304,17 @@ public class ComponentInstaller {
             File nextFile = classesDirIter.next();
             if (nextFile.toString().endsWith(".class")) {
                 String className = SourceUtil.classFileToClassName(nextFile, _classDir);
-                Class klass = SourceUtil.classNameToClass(className);
+                Class<?> klass = SourceUtil.classNameToClass(className, loader);
                 if (ComponentSourceDescriptor.isClassAComponent(klass)) {
                     compClassNames.add(className);
                 }
             }
         }
         return compClassNames;
+    }
+
+    private boolean isJarFile(String name) {
+        return name.endsWith(".jar") || name.endsWith(".JAR");
     }
 
 }

@@ -103,33 +103,21 @@ public class MeandreClient extends AbstractMeandreClient {
         _httpClient = new GenericHttpClient(serverHost, port, ClientLoggerFactory.getClientLogger());
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#setCredentials(java.lang.String, java.lang.String)
-     */
     @Override
     public void setCredentials(String userName, String password) {
         _httpClient.setCredentials(userName, password);
     }
     
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#setLogger(java.util.logging.Logger)
-     */
     @Override
     public void setLogger(Logger logger) {
         _httpClient.setLogger(logger);
     }
-    
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#getLogger()
-     */
+
     @Override
     public Logger getLogger() {
         return _httpClient.getLogger();
     }
-    
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#close()
-     */
+ 
     @Override
     public void close() {
         _httpClient.close();
@@ -159,9 +147,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveUserRoles()
-     */
     @Override
     public Set<String> retrieveUserRoles() throws TransmissionException {
         String reqPath = "/services/about/user_roles.json";
@@ -181,9 +166,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveValidRoles()
-     */
     @Override
     public Set<String> retrieveValidRoles() throws TransmissionException {
         String reqPath = "/services/about/valid_roles.json";
@@ -207,9 +189,6 @@ public class MeandreClient extends AbstractMeandreClient {
     //Locations (known peers of the server)
     //////////
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveLocations()
-     */
     @Override
     public Set<LocationBean> retrieveLocations() throws TransmissionException {
         String reqPath = "/services/locations/list.json";
@@ -231,9 +210,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#addLocation(java.lang.String, java.lang.String)
-     */
     @Override
     public boolean addLocation(String locationUrl, String description) throws TransmissionException {
         String reqPath = "/services/locations/add.json";
@@ -258,9 +234,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#removeLocation(java.lang.String)
-     */
     @Override
     public boolean removeLocation(String locationUrl) throws TransmissionException {
         String reqPath = "/services/locations/remove.json";
@@ -283,9 +256,6 @@ public class MeandreClient extends AbstractMeandreClient {
     //Repository
     /////////////
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveRepository()
-     */
     @Override
     public QueryableRepository retrieveRepository() throws TransmissionException {
         String reqPath = "/services/repository/dump.nt";
@@ -294,9 +264,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return new RepositoryImpl(model);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#regenerate()
-     */
     @Override
     public boolean regenerate() throws TransmissionException {
         String reqPath = "/services/repository/regenerate.json";
@@ -313,9 +280,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentUris()
-     */
     @Override
     public Set<URI> retrieveComponentUris() throws TransmissionException {
         String reqPath = "/services/repository/list_components.json";
@@ -335,9 +299,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowUris()
-     */
     @Override
     public Set<URI> retrieveFlowUris() throws TransmissionException {
         String reqPath = "/services/repository/list_flows.json";
@@ -357,10 +318,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveAllTags()
-     */
     @Override
     public Set<String> retrieveAllTags() throws TransmissionException {
         String reqPath = "/services/repository/tags.json";
@@ -380,9 +337,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentTags()
-     */
     @Override
     public Set<String> retrieveComponentTags() throws TransmissionException {
         String reqPath = "/services/repository/tags_components.json";
@@ -402,9 +356,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowTags()
-     */
     @Override
     public Set<String> retrieveFlowTags() throws TransmissionException {
         String reqPath = "/services/repository/tags_flows.json";
@@ -424,9 +375,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentsByTag(java.lang.String)
-     */
     @Override
     public Set<URI> retrieveComponentsByTag(String tag) throws TransmissionException {
         String argPath = "/services/repository/components_by_tag.json";
@@ -447,9 +395,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowsByTag(java.lang.String)
-     */
     @Override
     public Set<URI> retrieveFlowsByTag(String tag) throws TransmissionException {
         String reqPath = "/services/repository/flows_by_tag.json";
@@ -470,9 +415,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentDescriptor(java.lang.String)
-     */
     @Override
     public ExecutableComponentDescription retrieveComponentDescriptor(String componentUri) throws TransmissionException {
         String reqPath = "/services/repository/describe_component.nt";
@@ -490,9 +432,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return comp;
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowDescriptor(java.lang.String)
-     */
     @Override
     public FlowDescription retrieveFlowDescriptor(String flowUri) throws TransmissionException {
         String reqPath = "/services/repository/describe_flow.nt";
@@ -510,9 +449,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return flow;
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveComponentUrlsByQuery(java.lang.String)
-     */
     @Override
     public Set<URI> retrieveComponentUrlsByQuery(String query) throws TransmissionException {
         String reqPath = "/services/repository/search_components.json";
@@ -533,9 +469,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveFlowUrlsByQuery(java.lang.String)
-     */
     @Override
     public Set<URI> retrieveFlowUrlsByQuery(String query) throws TransmissionException {
         String reqPath = "/services/repository/search_flows.json";
@@ -556,17 +489,11 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadFlow(org.meandre.core.repository.FlowDescription, boolean)
-     */
     @Override
     public boolean uploadFlow(FlowDescription flow, boolean overwrite) throws TransmissionException {
         return uploadModel(flow.getModel(), null, overwrite);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadFlowBatch(java.util.Set, boolean)
-     */
     @Override
     public boolean uploadFlowBatch(Set<FlowDescription> flows, boolean overwrite) throws TransmissionException {
         HashSet<Model> hsFlowModels = new HashSet<Model>();
@@ -577,17 +504,11 @@ public class MeandreClient extends AbstractMeandreClient {
         return uploadModelBatch(hsFlowModels, null, overwrite);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadComponent(org.meandre.core.repository.ExecutableComponentDescription, java.util.Set, boolean)
-     */
     @Override
     public boolean uploadComponent(ExecutableComponentDescription component, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         return uploadModel(component.getModel(), jarFileContexts, overwrite);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadComponentBatch(java.util.Set, java.util.Set, boolean)
-     */
     @Override
     public boolean uploadComponentBatch(Set<ExecutableComponentDescription> components, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         HashSet<Model> hsComponentModels = new HashSet<Model>();
@@ -598,9 +519,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return uploadModelBatch(hsComponentModels, jarFileContexts, overwrite);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadRepository(org.meandre.core.repository.QueryableRepository, java.util.Set, boolean)
-     */
     @Override
     public boolean uploadRepository(QueryableRepository qr, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         return uploadModel(qr.getModel(), jarFileContexts, overwrite);
@@ -622,9 +540,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return uploadModelBatch(modSet, jarFileContexts, overwrite);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadModelBatch(java.util.Set, java.util.Set, boolean)
-     */
     @Override
     public boolean uploadModelBatch(Set<Model> resModels, Set<File> jarFileContexts, boolean overwrite) throws TransmissionException {
         String reqPath = "/services/repository/add.json";
@@ -657,9 +572,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#uploadFiles(java.util.Set, boolean)
-     */
     @Override
     public boolean uploadFiles(Set<File> files, boolean overwrite) throws TransmissionException {
         //just use the regular uploader with no models
@@ -668,9 +580,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return uploadModelBatch(emptyModelSet, files, overwrite);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#removeResource(java.lang.String)
-     */
     @Override
     public boolean removeResource(String resourceUri) throws TransmissionException{
         String reqPath = "/services/repository/remove.json";
@@ -694,9 +603,6 @@ public class MeandreClient extends AbstractMeandreClient {
     //Publish
     /////////
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#publish(java.lang.String)
-     */
     @Override
     public boolean publish(String resourceUri) throws TransmissionException {
         String reqPath = "/services/publish/publish.json";
@@ -713,9 +619,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#unpublish(java.lang.String)
-     */
     @Override
     public boolean unpublish(String resourceUri) throws TransmissionException {
         String reqPath = "/services/publish/unpublish.json";
@@ -736,9 +639,6 @@ public class MeandreClient extends AbstractMeandreClient {
     //Execution
     ///////////
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#runFlow(java.lang.String, boolean)
-     */
     @Override
     public String runFlow(String flowUri, boolean verbose) throws TransmissionException {
         String reqPath = "/services/execute/flow.txt";
@@ -773,9 +673,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance(), nvps.toArray(args));
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#runRepository(com.hp.hpl.jena.rdf.model.Model)
-     */
     @Override
     public String runRepository(Model model) throws TransmissionException {
         String reqPath = "/services/execute/repository.txt";
@@ -791,17 +688,11 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#runFlowStreamOutput(java.lang.String, boolean)
-     */
     @Override
     public InputStream runFlowStreamOutput(String flowUri, boolean verbose) throws TransmissionException {
         return runFlowStreamOutput(flowUri, null, verbose);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#runFlowStreamOutput(java.lang.String, java.lang.String, boolean)
-     */
     @Override
     public InputStream runFlowStreamOutput(String flowUri, String token, boolean verbose) throws TransmissionException {
         String reqPath = "/services/execute/flow.txt";
@@ -817,9 +708,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return _httpClient.doGET(reqPath, null, nvps.toArray(args));
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveWebUIInfo(java.lang.String)
-     */
     @Override
     public JSONObject retrieveWebUIInfo(String token) throws TransmissionException {
         String reqPath = "/services/execute/uri_flow.txt";
@@ -923,9 +811,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveJobStatuses()
-     */
     @Override
     public Vector<Map<String,String>> retrieveJobStatuses() throws TransmissionException {
         String reqPath = "/services/jobs/list_jobs_statuses.json";
@@ -952,9 +837,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveJobConsole(java.lang.String)
-     */
     @Override
     public String retrieveJobConsole(String sFUID) throws TransmissionException{
         String reqPath = "/services/jobs/job_console.json";
@@ -975,9 +857,6 @@ public class MeandreClient extends AbstractMeandreClient {
     //Public
     //////////////
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrievePublicRepository()
-     */
     @Override
     public QueryableRepository retrievePublicRepository() throws TransmissionException {
         String reqPath = "/public/services/repository.nt";
@@ -989,9 +868,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return new RepositoryImpl(model);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveDemoRepository()
-     */
     @Override
     public QueryableRepository retrieveDemoRepository() throws TransmissionException {
         String reqPath = "/public/services/demo_repository.nt";
@@ -1007,9 +883,6 @@ public class MeandreClient extends AbstractMeandreClient {
     //Admin of Running Flows
     ////////////////////////
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#abortFlow(int)
-     */
     @Override
     public boolean abortFlow(int webUIPort) throws TransmissionException {
         String reqPath = "/admin/abort.txt";
@@ -1026,9 +899,6 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#retrieveRunningFlowStatisitics(int)
-     */
     @Override
     public JSONObject retrieveRunningFlowStatisitics(int webUIPort) throws TransmissionException {
         String reqPath = "/admin/statistics.json";
@@ -1064,9 +934,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance(), argCompUri);
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#getServerVersion()
-     */
     @Override
     public String getServerVersion() throws TransmissionException {
         String reqPath = "/services/about/version.txt";
@@ -1099,9 +966,6 @@ public class MeandreClient extends AbstractMeandreClient {
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance());
     }
 
-    /* (non-Javadoc)
-     * @see org.meandre.client.v1.IMeandreClient#ping()
-     */
     @Override
     public boolean ping() throws TransmissionException {
         String reqPath = "/public/services/ping.txt";

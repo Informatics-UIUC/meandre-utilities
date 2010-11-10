@@ -187,6 +187,7 @@ public class FileUtil {
         return isStale;
     }
 
+    @SuppressWarnings("unused")
     private static void logWarn(String msg) {
         System.out.println(msg);
     }

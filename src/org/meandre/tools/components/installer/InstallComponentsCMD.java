@@ -183,7 +183,7 @@ public class InstallComponentsCMD {
     private static void exitWithError(JSAPResult parseResult, JSAP jsap) {
         System.err.println();
 
-        for (java.util.Iterator errs = parseResult.getErrorMessageIterator(); errs.hasNext();) {
+        for (java.util.Iterator<?> errs = parseResult.getErrorMessageIterator(); errs.hasNext();) {
             System.err.println("Error: " + errs.next());
         }
 
