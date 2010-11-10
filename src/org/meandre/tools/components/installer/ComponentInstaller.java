@@ -53,6 +53,8 @@ public class ComponentInstaller {
 
     ComponentJarBuilder _compJarBuilder;
     AppletJarBuilder _appletJarBuilder;
+    
+    static boolean _verbose = false;
 
     /**
      * creates an installer ready to analyze dependencies, create rdf
@@ -84,8 +86,10 @@ public class ComponentInstaller {
      *             if problem initializing a dependency analyzer in the
      *             classesDir and jarLibDir.
      */
-    public ComponentInstaller(File workingDir, File classesDir, File jarLibDir, AbstractMeandreClient uploadClient) throws IOException {
+    public ComponentInstaller(File workingDir, File classesDir, File jarLibDir, AbstractMeandreClient uploadClient, boolean verbose) throws IOException {
 
+        _verbose = verbose;
+        
         _depFinder = new CachingDependencyAnalyzer(jarLibDir, classesDir, workingDir);
         _jarLibDir = jarLibDir;
         _classDir = classesDir;
@@ -150,7 +154,6 @@ public class ComponentInstaller {
             jarFilesToUpload.add(jarFile);
         }
         
-
         // include any jars specified explicitly in the component annotations
         // that may not have been picked up by the DependencyAnalyzer
         Set<String> jarFileBaseNames = compDescriptor.getDeclaredJarDependencies();
@@ -162,10 +165,16 @@ public class ComponentInstaller {
             Set<File> appletJarFiles = getAllAppletJarDependencies(compDescriptor);
             jarFilesToUpload.addAll(appletJarFiles);
         }
-
+        
         logInfo("\tUploading Model and Jars");
         // always overwrite any existing component with this one
         boolean bOverwrite = true;
+        
+        StringBuilder sb = new StringBuilder();
+        for (File f : jarFilesToUpload)
+            sb.append(", ").append(f.getName());
+        System.out.println(String.format("Installing: %s\t(%s)", componentClassName, sb.substring(2)));
+        
         ExecutableComponentDescription ecd = compDescriptor.toExecutableComponentDescription();
         _mClient.uploadComponent(ecd, jarFilesToUpload, bOverwrite);
     }
@@ -237,8 +246,8 @@ public class ComponentInstaller {
     }
 
     private static void logInfo(String str) {
-        System.out.println(str);
-
+        if (_verbose)
+            System.out.println(str);
     }
 
     /**
@@ -308,5 +317,13 @@ public class ComponentInstaller {
             }
         }
         return compClassNames;
+    }
+    
+    public static void setVerbose(boolean verbose) {
+        _verbose = verbose;
+    }
+    
+    public static boolean getVerbose() {
+        return _verbose;
     }
 }

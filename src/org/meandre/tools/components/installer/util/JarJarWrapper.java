@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.meandre.tools.components.installer.ComponentInstaller;
+
 import com.tonicsystems.jarjar.AbstractDepHandler;
 import com.tonicsystems.jarjar.DepFind;
 import com.tonicsystems.jarjar.DepHandler;
@@ -165,7 +167,8 @@ public class JarJarWrapper {
     }
 
     private static void log(String msg) {
-        System.out.println("JarJarWrapper." + msg);
+        if (ComponentInstaller.getVerbose())
+            System.out.println("JarJarWrapper." + msg);
     }
 
     /**

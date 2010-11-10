@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.meandre.tools.components.installer.ComponentInstaller;
+
 /**
  * Detects and stores the dependencies between all class files and jar files in
  * a project. A DependencyAnalyzer is initialized with a jars directory and a
@@ -43,6 +45,8 @@ public class DependencyAnalyzer {
      * dependency map from .jar files to .jar files in the jarDir
      */
     DepMap _jarJarDeps;
+    
+    private boolean _verbose = false;
 
     /**
      * constructor that only initializes internal fields. use add*Deps methods
@@ -52,6 +56,8 @@ public class DependencyAnalyzer {
         _classClassDeps = new DepMap();
         _classJarDeps = new DepMap();
         _jarJarDeps = new DepMap();
+        
+        _verbose = ComponentInstaller.getVerbose();
     }
 
     /**
@@ -109,6 +115,10 @@ public class DependencyAnalyzer {
         }
     }
 
+    public void setVerbose(boolean verbose) {
+        _verbose = verbose;
+    }
+    
     /**
      * For a .class file in this analyzer's classDir, retrieve all .class files
      * it directly depends on. The returned set will include the target class
@@ -229,11 +239,11 @@ public class DependencyAnalyzer {
     private void populateClassClassDeps(DepMap depMap, File classDir) throws IOException {
         // Set<File> set = findClassClassDeps(classDir, classDir);
         // log(set.toString());
-        log("populateClassClassDeps: Begin");
+        if (_verbose) log("populateClassClassDeps: Begin");
         Iterator<File> allClassFilesIter = new FileTreeIterator(classDir);
         while (allClassFilesIter.hasNext()) {
             File nextFile = allClassFilesIter.next();
-            log("populateClassClassDeps: analyzing file:" + nextFile.toString());
+            if (_verbose) log("populateClassClassDeps: analyzing file:" + nextFile.toString());
             if (nextFile.toString().endsWith(".class")) {
                 Set<File> localDeps = findClassClassDeps(nextFile, classDir);
                 depMap.declareTarget(nextFile);
@@ -242,7 +252,7 @@ public class DependencyAnalyzer {
                 }
             }
         }
-        log("populateClassClassDeps: End");
+        if (_verbose) log("populateClassClassDeps: End");
     }
 
     /**

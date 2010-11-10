@@ -152,7 +152,7 @@ public class FileUtil {
                 throw new FileNotFoundException("did not find file with basename=\'" + baseName + "\'" + " in directory \'" + searchDir.toString()
                         + "\'");
             } else {
-                foundFiles.add(foundFile);
+                foundFiles.add(foundFile.getAbsoluteFile());
             }
         }
         return foundFiles;

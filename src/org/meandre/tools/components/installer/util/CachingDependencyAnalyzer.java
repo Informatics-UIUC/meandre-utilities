@@ -185,7 +185,10 @@ public class CachingDependencyAnalyzer extends DependencyAnalyzer {
         Set<File> depFiles = new HashSet<File>();
         while (reader.ready()) {
             String line = reader.readLine();
-            depFiles.add(new File(line));
+            File dep = new File(line);
+            if (!dep.exists())
+                throw new FileNotFoundException(dep.toString());
+            depFiles.add(dep);
         }
         reader.close();
         return depFiles;

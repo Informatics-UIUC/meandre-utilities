@@ -10,6 +10,7 @@ import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Switch;
 import com.martiansoftware.jsap.stringparsers.FileStringParser;
 
 public class InstallComponentsCMD {
@@ -43,6 +44,8 @@ public class InstallComponentsCMD {
 
     /** the password of user _serverUsername */
     static String _serverPassword;
+    
+    static boolean _verbose;
 
     public static void main(String[] args) throws Exception {
 
@@ -50,7 +53,7 @@ public class InstallComponentsCMD {
         parseArgs(args);
 
         AbstractMeandreClient mClient = AbstractMeandreClient.getClientForServer(_serverHost, _serverPort, _serverUsername, _serverPassword);
-        ComponentInstaller installer = new ComponentInstaller(_workingDir, _classDir, _jarLibDir, mClient);
+        ComponentInstaller installer = new ComponentInstaller(_workingDir, _classDir, _jarLibDir, mClient, _verbose);
         installer.installAllComponents();
     }
 
@@ -77,6 +80,7 @@ public class InstallComponentsCMD {
         _serverPort = config.getInt("meandrePort");
         _serverUsername = config.getString("meandreUsername");
         _serverPassword = config.getString("meandrePassword");
+        _verbose = config.getBoolean("verbose");
     }
 
     private static JSAP makeCommandLineParser() throws JSAPException, UnknownHostException {
@@ -164,6 +168,9 @@ public class InstallComponentsCMD {
         meandrePasswordOpt.setHelp("Password of Username for logging into the" + " Meandre-Infrastructre instance."
                 + " Defaults to 'admin' if unspecified.");
         jsap.registerParameter(meandrePasswordOpt);
+        
+        Switch verbose = new Switch("verbose", 'v', "verbose", "Enable verbose output");
+        jsap.registerParameter(verbose);
 
         return jsap;
     }

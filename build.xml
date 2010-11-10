@@ -148,6 +148,16 @@
 	<target name="dist" depends="compile" description="-> creates project  distribution">
 		<mkdir dir="${dist.dir}" />
 
+		<jar destfile="${dist.dir}/meandre-utilities-${version}.jar" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Implementation-Title" value="Meandre Utilities" />
+				<attribute name="Implementation-Version" value="${version}.${revision}" />
+				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
+				<attribute name="Build-Date" value="${TIMESTAMP}" />
+				<attribute name="Built-By" value="${user.name}" />
+			</manifest>
+		</jar>
+
 		<jar destfile="${dist.dir}/meandre-client-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/client/**">
 			<manifest>
 				<attribute name="Implementation-Title" value="MeandreClient" />
