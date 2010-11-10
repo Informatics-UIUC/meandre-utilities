@@ -104,16 +104,13 @@ public class ComponentInstaller {
         classPath.add(classesDir);
         FileUtils.findFiles(jarLibDir, new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                return isJarFile(name);
+                return name.endsWith(".jar") || name.endsWith(".JAR");
             }
         }, true, classPath);
         
         URL[] classUrls = new URL[classPath.size()];
-        for (int i = 0, iMax = classPath.size(); i < iMax; i++) {
-            File file = classPath.get(i);
-            classUrls[i] = isJarFile(file.getName()) ? 
-                    new URL(String.format("jar:%s!/", file.toURL().toString())) : file.toURL();
-        }
+        for (int i = 0, iMax = classPath.size(); i < iMax; i++)
+            classUrls[i] = classPath.get(i).toURL();
         
         loader = new URLClassLoader(classUrls);
     }
@@ -312,9 +309,4 @@ public class ComponentInstaller {
         }
         return compClassNames;
     }
-
-    private boolean isJarFile(String name) {
-        return name.endsWith(".jar") || name.endsWith(".JAR");
-    }
-
 }
