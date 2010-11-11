@@ -15,6 +15,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
@@ -32,6 +33,7 @@ import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ContentBody;
@@ -41,9 +43,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.meandre.tools.client.exceptions.TransmissionException;
+import org.seasr.meandre.support.generic.Version;
 import org.seasr.meandre.support.generic.util.KeyValuePair;
 
 /**
@@ -54,8 +58,8 @@ import org.seasr.meandre.support.generic.util.KeyValuePair;
 public class GenericHttpClient {
     
     private final HttpHost _host;
-    private final DefaultHttpClient _httpClient;
     private Logger _logger;
+    protected final DefaultHttpClient _httpClient;
     
     
     public GenericHttpClient(String host, int port) {
@@ -95,13 +99,17 @@ public class GenericHttpClient {
         };
 
         HttpParams params = new BasicHttpParams();
-        ConnManagerParams.setMaxTotalConnections(params, 200);
         ConnPerRouteBean connPerRoute = new ConnPerRouteBean(20);
         ConnManagerParams.setMaxConnectionsPerRoute(params, connPerRoute);
-        SchemeRegistry schreg = new SchemeRegistry();
-        schreg.register(new Scheme(_host.getSchemeName(), PlainSocketFactory.getSocketFactory(), _host.getPort()));
-        
-        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schreg);
+        ConnManagerParams.setMaxTotalConnections(params, 100);
+        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setUserAgent(params, "HttpClient/" + Version.getFullVersion());
+
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80)); 
+        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+       
+        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
         _httpClient = new DefaultHttpClient(cm, params);
         // Add as the very first interceptor in the protocol chain
         _httpClient.addRequestInterceptor(preemptiveAuth, 0);
