@@ -123,7 +123,7 @@
 
 	<target name="run-tests" depends="compile-tests" description="-> runs the test suite">
 		<mkdir dir="${test.dir}/xml" />
-		<junit fork="yes" printsummary="yes" showoutput="yes" haltonfailure="yes">
+		<junit fork="yes" dir="${test.dir}/output" printsummary="yes" showoutput="yes" haltonfailure="yes">
 			<classpath>
 				<pathelement path="${java.class.path}" />
 			</classpath>

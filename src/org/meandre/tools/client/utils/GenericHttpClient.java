@@ -23,6 +23,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
@@ -191,8 +192,9 @@ public class GenericHttpClient {
         for (NameValuePair param : params)
             entity.addPart(param.getName(), new StringBody(param.getValue()));
 
-        for (KeyValuePair<String, ContentBody> part : parts)
-            entity.addPart(part.getKey(), part.getValue());
+        if (parts != null)
+            for (KeyValuePair<String, ContentBody> part : parts)
+                entity.addPart(part.getKey(), part.getValue());
 
         HttpPost httpPost = new HttpPost(reqPath);
         if (headers != null)
@@ -203,6 +205,23 @@ public class GenericHttpClient {
 
         try {    
             return _httpClient.execute(_host, httpPost, handler);
+        }
+        catch (Exception e) {
+            throw new TransmissionException(e);
+        }
+    }
+    
+    public <T> T doDELETE(String reqPath, List<Header> headers, ResponseHandler<T> handler, NameValuePair... params) throws TransmissionException {
+        if (params.length > 0)
+            reqPath += "?" + URLEncodedUtils.format(Arrays.asList(params), "UTF-8");
+ 
+        HttpDelete httpDelete = new HttpDelete(reqPath);     
+        if (headers != null)
+            for (Header header : headers)
+                httpDelete.addHeader(header);
+        
+        try {
+            return _httpClient.execute(_host, httpDelete, handler);
         }
         catch (Exception e) {
             throw new TransmissionException(e);

@@ -19,7 +19,7 @@ import org.meandre.core.repository.LocationBean;
 import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.tools.client.exceptions.TransmissionException;
-import org.meandre.tools.client.utils.ClientLoggerFactory;
+import org.meandre.tools.client.utils.GenericLoggerFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -68,7 +68,7 @@ public class MeandreProxy extends MeandreClient {
 		super("",0);
 		bIsReady = bWasCallOK = false;
         //set logger to default client logger
-        setLogger(ClientLoggerFactory.getClientLogger());
+        setLogger(GenericLoggerFactory.getLogger());
 		qrCached = new RepositoryImpl(ModelFactory.createDefaultModel());
 	}
 
@@ -84,7 +84,7 @@ public class MeandreProxy extends MeandreClient {
             int iServerPort ) {
 		super(sUser,iServerPort);
         //set logger to default client logger
-        setLogger(ClientLoggerFactory.getClientLogger());
+        setLogger(GenericLoggerFactory.getLogger());
 		update(sUser,sPasswd,sServerHost,iServerPort);
 	}
 	

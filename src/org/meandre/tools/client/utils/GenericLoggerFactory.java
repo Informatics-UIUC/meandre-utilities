@@ -21,7 +21,7 @@ import org.seasr.meandre.support.generic.logging.formatter.GenericLogFormatter;
  * @author pgroves
  *
  */
-public class ClientLoggerFactory {
+public class GenericLoggerFactory {
     
     /** A basic logger for client code */
     private static Logger _log = null;
@@ -50,7 +50,7 @@ public class ClientLoggerFactory {
     
     /** Returns the default clientlogger.
      */
-    public static Logger getClientLogger() {
+    public static Logger getLogger() {
         return _log;
     }
     

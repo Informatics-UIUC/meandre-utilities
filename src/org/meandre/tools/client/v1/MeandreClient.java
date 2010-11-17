@@ -35,7 +35,7 @@ import org.meandre.core.repository.QueryableRepository;
 import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.tools.client.AbstractMeandreClient;
 import org.meandre.tools.client.exceptions.TransmissionException;
-import org.meandre.tools.client.utils.ClientLoggerFactory;
+import org.meandre.tools.client.utils.GenericLoggerFactory;
 import org.meandre.tools.client.utils.GenericHttpClient;
 import org.meandre.tools.client.utils.handlers.JSONResponseHandler;
 import org.meandre.tools.client.utils.handlers.RDFModelResponseHandler;
@@ -100,7 +100,7 @@ public class MeandreClient extends AbstractMeandreClient {
      * @param port the port on the serverHost that the server is listening on
      */
     public MeandreClient(String serverHost, int port) {
-        _httpClient = new GenericHttpClient(serverHost, port, ClientLoggerFactory.getClientLogger());
+        _httpClient = new GenericHttpClient(serverHost, port, GenericLoggerFactory.getLogger());
     }
 
     @Override
