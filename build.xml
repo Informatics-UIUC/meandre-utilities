@@ -260,6 +260,22 @@
 				<include name="org/meandre/tools/zigzag/transformations/**" />
 				<include name="org/meandre/tools/Version.class" />
 			</fileset>
+		</jar>
+
+		<jar destfile="${dist.dir}/rdf2zz-deps-${version}.jar">
+			<manifest>
+				<attribute name="Implementation-Title" value="RDF-to-ZigZag Converter" />
+				<attribute name="Implementation-Version" value="${version}.${revision}" />
+				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
+				<attribute name="Build-Date" value="${TIMESTAMP}" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Main-Class" value="org.meandre.tools.zigzag.transformations.RDF2ZZMain" />
+			</manifest>
+
+			<fileset dir="${build.dir}">
+				<include name="org/meandre/tools/zigzag/transformations/**" />
+				<include name="org/meandre/tools/Version.class" />
+			</fileset>
 
 			<zipgroupfileset dir="${dist.dir}" includes="meandre-client-deps-${version}.jar" />
 			<zipgroupfileset dir="${lib.dir}" includes="jsap*.jar" />
