@@ -46,6 +46,8 @@
 
 	<property name="version" value="1.4.9" />
 	<property name="debug" value="true" />
+	<property name="compile.target" value="1.5" />
+
 
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="src.test.dir" value="${basedir}/src-test" />
@@ -113,12 +115,12 @@
 
 	<target name="compile" depends="prepare" description="-> compiles the project code">
 		<mkdir dir="${build.dir}" />
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.classpath" debug="${debug}" includeantruntime="false" />
+		<javac target="${compile.target}" srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.classpath" debug="${debug}" includeantruntime="false" />
 	</target>
 
 	<target name="compile-tests" depends="compile" description="-> compiles the test code">
 		<mkdir dir="${build.test.dir}" />
-		<javac srcdir="${src.test.dir}" destdir="${build.test.dir}" classpathref="build.classpath" debug="${debug}" includeantruntime="false" />
+		<javac target="${compile.target}" srcdir="${src.test.dir}" destdir="${build.test.dir}" classpathref="build.classpath" debug="${debug}" includeantruntime="false" />
 	</target>
 
 	<target name="run-tests" depends="compile-tests" description="-> runs the test suite">
