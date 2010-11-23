@@ -114,7 +114,7 @@ public class ComponentInstaller {
         
         URL[] classUrls = new URL[classPath.size()];
         for (int i = 0, iMax = classPath.size(); i < iMax; i++)
-            classUrls[i] = classPath.get(i).toURL();
+            classUrls[i] = classPath.get(i).toURI().toURL();
         
         loader = new URLClassLoader(classUrls);
     }

@@ -47,7 +47,13 @@ public class JarJarWrapper {
         ClassDepHandler jarJarHandler = new ClassDepHandler();
         DepFind jarJarAnalyzer = new DepFind();
 
-        jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
+        try {
+            jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
+        }
+        catch (RuntimeException e) {
+            log("Could not detect dependencies for: " + classFile);
+            throw e;
+        }
 
         // turn the string classnames into File objects
         Set<String> classNameDeps = jarJarHandler.getClassSet();
@@ -77,8 +83,14 @@ public class JarJarWrapper {
         JarDepHandler jarJarHandler = new JarDepHandler();
         DepFind jarJarAnalyzer = new DepFind();
 
-        jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
-
+        try {
+            jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
+        }
+        catch (RuntimeException e) {
+            log("Could not detect dependencies for: " + classFile);
+            throw e;
+        }
+        
         // turn the string filenames into File objects
         // Set<String> fileNameDeps = jarJarHandler.getJarSet();
         // Set<File> fileDeps = fileNameSetToFileSet(fileNameDeps);
@@ -101,7 +113,14 @@ public class JarJarWrapper {
 
         String sJarJarClasspath = makeJarJarClasspathFromJarDir(jarDirToSearch);
 
-        jarJarAnalyzer.run(jarFile.toString(), sJarJarClasspath, jarJarHandler);
+        try {
+            jarJarAnalyzer.run(jarFile.toString(), sJarJarClasspath, jarJarHandler);
+        }
+        catch (RuntimeException e) {
+            log("Could not detect dependencies for: " + jarFile);
+            throw e;
+        }
+        
         Set<File> foundDeps = jarJarHandler.getJarSet();
         foundDeps.add(jarFile);
         log("directJarToJarDependencies: found " + foundDeps.size() + " deps for jar: " + jarFile.getName());

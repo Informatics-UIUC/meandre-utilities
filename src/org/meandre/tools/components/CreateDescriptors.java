@@ -117,9 +117,9 @@ public class CreateDescriptors {
         FileUtils.findFiles(libDir, JAR_FILTER, true, jarFiles);
 
         URL[] classPathUrls = new URL[jarFiles.size() + 1];
-        classPathUrls[0] = classesDir.toURL();
+        classPathUrls[0] = classesDir.toURI().toURL();
         for (int i = 1, iMax = classPathUrls.length; i < iMax; i++)
-            classPathUrls[i] = jarFiles.get(i-1).toURL();
+            classPathUrls[i] = jarFiles.get(i-1).toURI().toURL();
 
         URLClassLoader classLoader = new URLClassLoader(classPathUrls);
         CreateComponentDescriptor.setClassLoader(classLoader);
