@@ -50,10 +50,6 @@ public class JarJarWrapper {
         try {
             jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
         }
-        catch (IllegalStateException e) {
-            System.err.println("Could not detect dependencies for: " + classFile);
-            throw e;
-        }
         catch (Throwable e) {
             System.err.println("Could not detect dependencies for: " + classFile);
             throw new RuntimeException(e);
@@ -90,10 +86,6 @@ public class JarJarWrapper {
         try {
             jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
         }
-        catch (IllegalStateException e) {
-            System.err.println("Could not detect dependencies for: " + classFile);
-            throw e;
-        }
         catch (Throwable e) {
             System.err.println("Could not detect dependencies for: " + classFile);
             throw new RuntimeException(e);
@@ -124,10 +116,6 @@ public class JarJarWrapper {
 
         try {
             jarJarAnalyzer.run(jarFile.toString(), sJarJarClasspath, jarJarHandler);
-        }
-        catch (IllegalStateException e) {
-            System.err.println("Could not detect dependencies for: " + jarFile);
-            throw e;
         }
         catch (Throwable e) {
             System.err.println("Could not detect dependencies for: " + jarFile);
