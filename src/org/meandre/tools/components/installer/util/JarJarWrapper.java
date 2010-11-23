@@ -50,9 +50,13 @@ public class JarJarWrapper {
         try {
             jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
         }
-        catch (RuntimeException e) {
+        catch (IllegalStateException e) {
             log("Could not detect dependencies for: " + classFile);
             throw e;
+        }
+        catch (Throwable e) {
+            log("Could not detect dependencies for: " + classFile);
+            throw new RuntimeException(e);
         }
 
         // turn the string classnames into File objects
@@ -86,10 +90,15 @@ public class JarJarWrapper {
         try {
             jarJarAnalyzer.run(classFile.toString(), sJarJarClasspath, jarJarHandler);
         }
-        catch (RuntimeException e) {
+        catch (IllegalStateException e) {
             log("Could not detect dependencies for: " + classFile);
             throw e;
         }
+        catch (Throwable e) {
+            log("Could not detect dependencies for: " + classFile);
+            throw new RuntimeException(e);
+        }
+
         
         // turn the string filenames into File objects
         // Set<String> fileNameDeps = jarJarHandler.getJarSet();
@@ -116,10 +125,15 @@ public class JarJarWrapper {
         try {
             jarJarAnalyzer.run(jarFile.toString(), sJarJarClasspath, jarJarHandler);
         }
-        catch (RuntimeException e) {
+        catch (IllegalStateException e) {
             log("Could not detect dependencies for: " + jarFile);
             throw e;
         }
+        catch (Throwable e) {
+            log("Could not detect dependencies for: " + jarFile);
+            throw new RuntimeException(e);
+        }
+
         
         Set<File> foundDeps = jarJarHandler.getJarSet();
         foundDeps.add(jarFile);
