@@ -49,7 +49,7 @@ public class ComponentInstaller {
 
     AbstractMeandreClient _mClient;
     
-    final URLClassLoader loader;
+    final ClassLoader loader;
 
     ComponentJarBuilder _compJarBuilder;
     AppletJarBuilder _appletJarBuilder;
@@ -117,11 +117,15 @@ public class ComponentInstaller {
             classUrls[i] = classPath.get(i).toURI().toURL();
         
         loader = new URLClassLoader(classUrls);
+        // loader = getClass().getClassLoader();
     }
 
     public void installComponent(String componentClassName) throws IOException, ClassNotFoundException, CorruptedDescriptionException,
             TransmissionException {
 
+        System.out.print("Installing: " + componentClassName);
+        System.out.flush();
+        
         File compClassFile = SourceUtil.classNameToClassFile(componentClassName, _classDir);
 
         // make rdf descriptor, write it to file
@@ -150,7 +154,7 @@ public class ComponentInstaller {
         // Remove any JARs that are part of the Meandre server (and shouldn't be uploaded)
         for (File jarFile : libJarDeps) {
             String jarName = jarFile.getName().toLowerCase();
-            if (jarName.startsWith("meandre-")) continue;
+            if (jarName.startsWith("meandre-") || jarName.startsWith("gwt-dev")) continue;
             jarFilesToUpload.add(jarFile);
         }
         
@@ -173,7 +177,7 @@ public class ComponentInstaller {
         StringBuilder sb = new StringBuilder();
         for (File f : jarFilesToUpload)
             sb.append(", ").append(f.getName());
-        System.out.println(String.format("Installing: %s\t(%s)", componentClassName, sb.substring(2)));
+        System.out.println(String.format("\t(%s)", sb.substring(2)));
         
         ExecutableComponentDescription ecd = compDescriptor.toExecutableComponentDescription();
         _mClient.uploadComponent(ecd, jarFilesToUpload, bOverwrite);
@@ -311,6 +315,7 @@ public class ComponentInstaller {
             if (nextFile.toString().endsWith(".class")) {
                 String className = SourceUtil.classFileToClassName(nextFile, _classDir);
                 Class<?> klass = SourceUtil.classNameToClass(className, loader);
+                if (klass == null) System.err.println("WARNING: " + className + " from " + nextFile + " not resolvable with current classpath");
                 if (ComponentSourceDescriptor.isClassAComponent(klass)) {
                     compClassNames.add(className);
                 }

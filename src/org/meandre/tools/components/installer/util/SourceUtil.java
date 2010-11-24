@@ -110,8 +110,16 @@ public class SourceUtil{
 
     public static Class<?> classNameToClass(String className, ClassLoader loader) 
     		throws ClassNotFoundException{
-		Class<?> klass = Class.forName(className, true, loader);
+        try {
+		Class<?> klass = Class.forName(className, false, loader);
     	return klass;
+        }
+        catch (ClassNotFoundException e) {
+            return null;
+        }
+        catch (NoClassDefFoundError e) {
+            return null;
+        }
 	}
 
 	public static File classToClassFile(Class<?> klass, File classesDir) {

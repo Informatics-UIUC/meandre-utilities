@@ -72,6 +72,7 @@ public class ComponentSourceDescriptor {
 
     /** true if the input klass as a Component Annotation. */
     public static boolean isClassAComponent(Class<?> klass) {
+        if (klass == null) return false;
         return (null != klass.getAnnotation(Component.class));
     }
 
