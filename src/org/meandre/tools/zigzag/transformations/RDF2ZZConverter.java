@@ -60,9 +60,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * Class that generates a ZigZag script based on a flow
- * 
+ *
  * Dependencies:
- * 
+ *
  * jena-2.6.3.jar
  * meandre-repository-1.4.9.jar
  *
@@ -240,7 +240,7 @@ public class RDF2ZZConverter {
             for (Entry<String, String> property : compInstanceProps.entrySet())
                 if (compDefaultProps.containsKey(property.getKey()))
                     sb.append(String.format("%s.%s = \"%s\"", compInstanceVarName,
-                        property.getKey(), property.getValue())).append(NEWLINE);
+                        property.getKey(), property.getValue().replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\""))).append(NEWLINE);
 
             sb.append(NEWLINE);
         }
