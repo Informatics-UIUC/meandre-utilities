@@ -58,9 +58,9 @@ import org.seasr.meandre.support.generic.io.FileUtils;
  * @author Boris Capitanu
  *
  * Dependencies required:
- * 
- * meandre-annotation-1.4.9.jar
- * meandre-kernel-1.4.9.jar
+ *
+ * meandre-annotation-1.4.10.jar
+ * meandre-kernel-1.4.10.jar
  * seasr-commons.jar
  * jena-2.6.3.jar
  * slf4j-api-1.5.8.jar
@@ -69,18 +69,20 @@ import org.seasr.meandre.support.generic.io.FileUtils;
  * xercesImpl-2.7.1.jar
  * iri-0.8.jar
  * icu4j-3.4.4.jar
- * 
+ *
  */
 
 public class CreateDescriptors {
 
     private static final FileFilter CLASS_FILTER = new FileFilter() {
+        @Override
         public boolean accept(File pathname) {
             return pathname.getName().endsWith(".class") || pathname.getName().endsWith(".CLASS");
         }
     };
 
     private static final FileFilter JAR_FILTER = new FileFilter() {
+        @Override
         public boolean accept(File pathname) {
             return pathname.getName().endsWith(".jar") || pathname.getName().endsWith(".JAR");
         }
