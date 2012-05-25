@@ -39,16 +39,17 @@
   -->
 
 <project>
-    <!-- Check whether Java 1.5 or Java 1.6 is being used -->
-    <condition property="jdk15or16">
+    <!-- Check whether Java 1.5 or Java 1.6 or Java 1.7 is being used -->
+    <condition property="validjdk">
         <or>
             <contains string="${java.version}" substring="1.5"/>
             <contains string="${java.version}" substring="1.6"/>
+            <contains string="${java.version}" substring="1.7"/>
         </or>
     </condition>
 
-    <fail unless="jdk15or16"
-          message="This project requires Java 5 or Java 6. Please set JAVA_HOME to point to where JDK is installed."/>
+    <fail unless="validjdk"
+          message="This project requires Java 5, Java 6, or Java 7. Please set JAVA_HOME to point to where JDK is installed."/>
 
     <path id="svnant.classpath">
         <fileset dir="${basedir}/lib/build">
