@@ -28,9 +28,9 @@ public abstract class AbstractMeandreClient {
     public abstract void setLogger(Logger logger);
 
     public abstract Logger getLogger();
-    
+
     public abstract String getHostName();
-    
+
     public abstract int getPort();
 
     public abstract void close();
@@ -451,7 +451,7 @@ public abstract class AbstractMeandreClient {
      * FIXME: This is totally untested.
      */
     public abstract boolean abortFlow(int webUIPort) throws TransmissionException;
-    
+
     /**
      * requests the current statistics of the currently running flow from
      * the WEBUI. the flow is specified by the port on the server that
@@ -470,15 +470,15 @@ public abstract class AbstractMeandreClient {
      */
     public abstract JSONObject retrieveRunningFlowStatisitics(int webUIPort) throws TransmissionException;
 
-    /** 
+    /**
      * Gets the server version.
      *
-     * @return The server version
+     * @return The server version description object
      * @throws TransmissionException Could not get the server version
      */
-    public abstract String getServerVersion() throws TransmissionException;
+    public abstract JSONObject getServerVersion() throws TransmissionException;
 
-    /** 
+    /**
      * Pings the server
      *
      *	@return True if it successfully pinged the server
@@ -499,7 +499,7 @@ public abstract class AbstractMeandreClient {
             }
             String ver = IOUtils.getTextFromReader(new InputStreamReader(connection.getInputStream()));
             JSONObject joVersion = new JSONObject(ver);
-            
+
             if (joVersion.getString("version").startsWith("1.4"))
                 client = new org.meandre.tools.client.v1.MeandreClient(hostName, port);
 
@@ -510,10 +510,10 @@ public abstract class AbstractMeandreClient {
             // Assume 2.0
             client = new org.meandre.tools.client.v2.MeandreClient(hostName, port);
         }
-        
+
         if (client != null && userName != null)
             client.setCredentials(userName, password);
-        
+
         return client;
     }
 }

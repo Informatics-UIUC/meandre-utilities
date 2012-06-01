@@ -2,7 +2,11 @@ package org.meandre.tools.client.v2;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.http.NameValuePair;
@@ -31,8 +36,8 @@ import org.meandre.core.repository.RepositoryImpl;
 import org.meandre.tools.client.AbstractMeandreClient;
 import org.meandre.tools.client.exceptions.OperationFailedException;
 import org.meandre.tools.client.exceptions.TransmissionException;
-import org.meandre.tools.client.utils.GenericLoggerFactory;
 import org.meandre.tools.client.utils.GenericHttpClient;
+import org.meandre.tools.client.utils.GenericLoggerFactory;
 import org.meandre.tools.client.utils.handlers.JSONResponseHandler;
 import org.meandre.tools.client.utils.handlers.RDFModelResponseHandler;
 import org.meandre.tools.client.utils.handlers.StringResponseHandler;
@@ -47,20 +52,20 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
  * Programmatic interface to the Meandre server webservices API.
- * 
+ *
  * <p>The setCredentials() method must be called before authorized calls on
  * a MeandreClient can be invoked. All calls are authorized unless they say
  * specifically that they do not require authorization.
- * 
+ *
  * Dependencies required for this to work:
- * 
+ *
  * commons-codec-1.3.jar
  * commons-logging-1.1.1.jar
  * httpclient-4.0.3.jar
  * httpcore-4.0.1.jar
  * httpmime-4.0.3.jar
  * apache-mime4j-0.6.jar
- * 
+ *
  * arq-2.8.4.jar
  * icu4j-3.4.4.jar
  * iri-0.8.jar
@@ -74,14 +79,14 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * lucene-core-2.3.1.jar
  *
  * json.jar
- * 
+ *
  * meandre-kernel-1.4.9.jar
  * seasr-commons.jar
  *
  * @author Boris Capitanu
  */
 public class MeandreClient extends AbstractMeandreClient {
-    
+
     private final GenericHttpClient _httpClient;
 
     /**
@@ -101,17 +106,17 @@ public class MeandreClient extends AbstractMeandreClient {
     public void setCredentials(String userName, String password) {
         _httpClient.setCredentials(userName, password);
     }
-    
+
     @Override
     public void setLogger(Logger logger) {
         _httpClient.setLogger(logger);
     }
-    
+
     @Override
     public Logger getLogger() {
         return _httpClient.getLogger();
     }
-    
+
     @Override
     public void close() {
         _httpClient.close();
@@ -119,7 +124,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/security/user.json
-     * 
+     *
      * @return The set of user roles
      * @throws TransmissionException
      */
@@ -131,7 +136,7 @@ public class MeandreClient extends AbstractMeandreClient {
         try {
             JSONObject joUser = getSuccessPayload(jtRoles).getJSONObject("user");
             JSONArray jaRoles = joUser.getJSONArray("roles");
-            
+
             Set<String> roles = new HashSet<String>();
             for (int i = 0, iMax = jaRoles.length(); i < iMax; i++)
                 roles.add(jaRoles.getString(i));
@@ -145,10 +150,10 @@ public class MeandreClient extends AbstractMeandreClient {
             throw new TransmissionException(e);
         }
     }
-    
+
     /**
      * /services/security/valid_roles.json
-     * 
+     *
      * @return The set of valid roles
      * @throws TransmissionException
      */
@@ -159,7 +164,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
         try {
             JSONArray jaRoles = getSuccessPayload(jtRoles).getJSONArray("roles");
-            
+
             Set<String> roles = new HashSet<String>();
             for (int i = 0, iMax = jaRoles.length(); i < iMax; i++)
                 roles.add(jaRoles.getString(i));
@@ -180,7 +185,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/locations/list.json
-     * 
+     *
      * @return The list of locations
      * @throws TransmissionException
      */
@@ -188,10 +193,10 @@ public class MeandreClient extends AbstractMeandreClient {
     public Set<LocationBean> retrieveLocations() throws TransmissionException {
         String reqPath = "/services/locations/list.json";
         JSONTokener jtLocs = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
-        
+
         try {
             JSONArray jaLocations = getSuccessPayload(jtLocs).getJSONArray("locations");
-            
+
             HashSet<LocationBean> locations = new HashSet<LocationBean>();
             for (int i = 0, iMax = jaLocations.length(); i < iMax; i++) {
                 JSONObject joLocation = jaLocations.getJSONObject(i);
@@ -225,9 +230,9 @@ public class MeandreClient extends AbstractMeandreClient {
         nvps[1] = new BasicNameValuePair("description", description);
 
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance(), nvps);
-        
+
         try {
-            return getSuccessPayload(jtRetrieved).has("added_uris");  
+            return getSuccessPayload(jtRetrieved).has("added_uris");
         }
         catch (JSONException e) {
             throw new TransmissionException(e);
@@ -239,7 +244,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/locations/remove.json
-     * 
+     *
      * @param locationUrl The location URL to remove
      * @return True for success, False otherwise
      * @throws TransmissionException
@@ -250,11 +255,11 @@ public class MeandreClient extends AbstractMeandreClient {
 
         NameValuePair argLoc = new BasicNameValuePair("location", locationUrl);
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance(), argLoc);
-        
+
         try {
             JSONArray jaRemoved = getSuccessPayload(jtRetrieved).getJSONArray("removed_locations");
             String location = jaRemoved.getString(0);
-            
+
             return location.equals(locationUrl);
         }
         catch (JSONException e) {
@@ -271,7 +276,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/describe.nt
-     * 
+     *
      * @return A QueryableRepository for programmatic access to the repository
      * @throws TransmissionException
      */
@@ -279,13 +284,13 @@ public class MeandreClient extends AbstractMeandreClient {
     public QueryableRepository retrieveRepository() throws TransmissionException {
         String reqPath = "/services/repository/describe.nt";
         Model model = _httpClient.doGET(reqPath, null, RDFModelResponseHandler.getInstance());
-        
+
         return new RepositoryImpl(model);
     }
 
     /**
      * /services/repository/regenerate.json
-     * 
+     *
      * @return True if success, False otherwise
      * @throws TransmissionException
      */
@@ -293,7 +298,7 @@ public class MeandreClient extends AbstractMeandreClient {
     public boolean regenerate() throws TransmissionException {
         String reqPath = "/services/repository/regenerate.json";
         JSONTokener jt = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
-        
+
         try {
             return getSuccessPayload(jt).has("added_uris");
         }
@@ -307,7 +312,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/list_components.json
-     * 
+     *
      * @return The set of component URIs
      * @throws TransmissionException
      */
@@ -315,14 +320,14 @@ public class MeandreClient extends AbstractMeandreClient {
     public Set<URI> retrieveComponentUris() throws TransmissionException {
         String reqPath = "/services/repository/list_components.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
-        
+
         try {
             JSONArray jaComponents = getSuccessPayload(jtRetrieved).getJSONArray("components");
-            
+
             Set<URI> compURIs = new HashSet<URI>();
             for (int i = 0, iMax = jaComponents.length(); i < iMax; i++)
                 compURIs.add(new URI(jaComponents.getJSONObject(i).getString("uri")));
-            
+
             return compURIs;
         }
         catch (Exception e) {
@@ -332,7 +337,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/list_flows.json
-     * 
+     *
      * @return The set of flow URIs
      * @throws TransmissionException
      */
@@ -340,14 +345,14 @@ public class MeandreClient extends AbstractMeandreClient {
     public Set<URI> retrieveFlowUris() throws TransmissionException {
         String reqPath = "/services/repository/list_flows.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
-        
+
         try {
             JSONArray jaComponents = getSuccessPayload(jtRetrieved).getJSONArray("flows");
-            
+
             Set<URI> flowURIs = new HashSet<URI>();
             for (int i = 0, iMax = jaComponents.length(); i < iMax; i++)
                 flowURIs.add(new URI(jaComponents.getJSONObject(i).getString("uri")));
-            
+
             return flowURIs;
         }
         catch (Exception e) {
@@ -357,7 +362,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/tags.json
-     * 
+     *
      * @return The set of all tags
      * @throws TransmissionException
      */
@@ -365,16 +370,16 @@ public class MeandreClient extends AbstractMeandreClient {
     public Set<String> retrieveAllTags() throws TransmissionException {
         String reqPath = "/services/repository/tags.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
-        
+
         try {
             JSONObject joTags = getSuccessPayload(jtRetrieved).getJSONObject("tags");
-            
+
             Set<String> tags = new HashSet<String>();
             @SuppressWarnings("unchecked")
             Iterator<String> iter = joTags.keys();
             while (iter.hasNext())
                 tags.add(iter.next());
-            
+
             return tags;
         }
         catch (JSONException e) {
@@ -387,7 +392,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/tags_components.json
-     * 
+     *
      * @return The set of all component tags
      * @throws TransmissionException
      */
@@ -398,13 +403,13 @@ public class MeandreClient extends AbstractMeandreClient {
 
         try {
             JSONObject joTags = getSuccessPayload(jtRetrieved).getJSONObject("tags");
-            
+
             Set<String> tags = new HashSet<String>();
             @SuppressWarnings("unchecked")
             Iterator<String> iter = joTags.keys();
             while (iter.hasNext())
                 tags.add(iter.next());
-            
+
             return tags;
         }
         catch (JSONException e) {
@@ -417,7 +422,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/tags_flows.json
-     * 
+     *
      * @return The set of all flow tags
      * @throws TransmissionException
      */
@@ -425,16 +430,16 @@ public class MeandreClient extends AbstractMeandreClient {
     public Set<String> retrieveFlowTags() throws TransmissionException {
         String reqPath = "/services/repository/tags_flows.json";
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
-        
+
         try {
             JSONObject joTags = getSuccessPayload(jtRetrieved).getJSONObject("tags");
-            
+
             Set<String> tags = new HashSet<String>();
             @SuppressWarnings("unchecked")
             Iterator<String> iter = joTags.keys();
             while (iter.hasNext())
                 tags.add(iter.next());
-            
+
             return tags;
         }
         catch (JSONException e) {
@@ -463,7 +468,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/describe.nt
-     * 
+     *
      * @param componentUri The component URI to retrieve
      * @throws TransmissionException
      */
@@ -486,7 +491,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/describe.nt
-     * 
+     *
      * @param flowUri The flow URI to retrieve
      * @throws TransmissionException
      */
@@ -503,7 +508,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
         if (iter.hasNext())
             throw new TransmissionException("More than one flow descriptor was returned by the server.");
-        
+
         return flow;
     }
 
@@ -568,7 +573,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/add.json
-     * 
+     *
      * @param qr The QueryableRepository to upload
      * @param contexts The contexts
      * @param overwrite True to overwrite, False otherwise
@@ -582,7 +587,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/add.json
-     * 
+     *
      * @param model The model
      * @param contexts The contexts
      * @param overwrite True to overwrite, False otherwise
@@ -592,13 +597,13 @@ public class MeandreClient extends AbstractMeandreClient {
     private boolean uploadModel(Model model, Set<File> contexts, boolean overwrite) throws TransmissionException {
         HashSet<Model> modSet = new HashSet<Model>(1);
         modSet.add(model);
-        
+
         return uploadModelBatch(modSet, contexts, overwrite);
     }
 
     /**
      * /services/repository/add.json
-     * 
+     *
      * @param models The models to upload
      * @param contexts The contexts
      * @param overwrite True to overwrite, False otherwise
@@ -608,7 +613,7 @@ public class MeandreClient extends AbstractMeandreClient {
     @Override
     public boolean uploadModelBatch(Set<Model> models, Set<File> contexts, boolean overwrite) throws TransmissionException {
         String reqPath = "/services/repository/add.json";
-        
+
         NameValuePair argOverwrite = new BasicNameValuePair("overwrite", Boolean.toString(overwrite));
         List<KeyValuePair<String, ContentBody>> parts = new ArrayList<KeyValuePair<String,ContentBody>>();
 
@@ -617,20 +622,20 @@ public class MeandreClient extends AbstractMeandreClient {
                 String sModel = ModelUtils.modelToDialect(modUpload, "N-TRIPLE");
                 parts.add(new KeyValuePair<String, ContentBody>("repository", new StringBody(sModel)));
             }
-    
+
             if (contexts != null)
-                for (File jarFile : contexts) 
+                for (File jarFile : contexts)
                     if (jarFile.exists())
                         parts.add(new KeyValuePair<String, ContentBody>("context", new FileBody(jarFile)));
                     else
                         throw new TransmissionException(new FileNotFoundException(jarFile.toString()));
-            
+
             JSONTokener response = _httpClient.doPOST(reqPath, null, parts, JSONResponseHandler.getInstance(), argOverwrite);
             return getSuccessPayload(response).has("uris");
         }
         catch (OperationFailedException e) {
             return false;
-        }       
+        }
         catch (Exception e) {
             throw new TransmissionException(e);
         }
@@ -638,7 +643,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/repository/add.json
-     * 
+     *
      * @param files The files
      * @param overwrite True to overwrite, False otherwise
      * @return True if success, False otherwise
@@ -648,13 +653,13 @@ public class MeandreClient extends AbstractMeandreClient {
     public boolean uploadFiles(Set<File> files, boolean overwrite) throws TransmissionException {
         //just use the regular uploader with no models
         Set<Model> emptyModelSet = new HashSet<Model>(0);
-        
+
         return uploadModelBatch(emptyModelSet, files, overwrite);
     }
 
     /**
      * /services/repository/remove.json
-     * 
+     *
      * @param resourceUri The resource URI
      * @return True if success, False otherwise
      * @throws TransmissionException
@@ -664,12 +669,12 @@ public class MeandreClient extends AbstractMeandreClient {
         String reqPath = "/services/repository/remove.json";
         NameValuePair argRes = new BasicNameValuePair("uri", resourceUri);
         JSONTokener jtRetrieved = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance(), argRes);
-        
+
         try{
             JSONArray jaRemoved = getSuccessPayload(jtRetrieved).getJSONArray("uris");
-            
+
             return jaRemoved.length() == 1 && jaRemoved.getString(0).equals(resourceUri);
-        } 
+        }
         catch (JSONException e) {
             throw new TransmissionException(e);
         }
@@ -684,7 +689,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/publish/publish.json
-     * 
+     *
      * @param resourceUri The resource URI to publish
      * @return True if success, False otherwise
      * @throws TransmissionException
@@ -710,7 +715,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/publish/unpublish.json
-     * 
+     *
      * @param resourceUri The resource URI to unpublish
      * @return True if success, False otherwise
      * @throws TransmissionException
@@ -774,25 +779,194 @@ public class MeandreClient extends AbstractMeandreClient {
      */
     @Override
     public InputStream runFlowStreamOutput(String flowUri, String token, boolean verbose) throws TransmissionException {
-        throw new NotImplementedException();
+    	throw new NotImplementedException();
     }
-    
+
+    public InputStream retrieveJobOutput(final String jobID) throws TransmissionException {
+        PipedInputStream in = new PipedInputStream();
+
+        final PipedOutputStream out;
+		try {
+			out = new PipedOutputStream(in);
+		}
+		catch (IOException e2) {
+			throw new TransmissionException(e2);
+		}
+
+        new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					String reqPathLog = "/services/jobs/log.json";
+					String reqPathConsole = "/services/jobs/console.json";
+
+			        NameValuePair argJobID = new BasicNameValuePair("jobID", jobID);
+
+			        OutputStreamWriter writer = null;
+			        try {
+				        writer = new OutputStreamWriter(out, "UTF-8");
+
+				        JSONObject jobStatus;
+				        int sinceLog = 0, sinceConsole = 0;
+						do {
+				        	jobStatus = retrieveJobStatus(jobID);
+
+					        NameValuePair argSinceLog = new BasicNameValuePair("since", Integer.toString(sinceLog));
+					        JSONTokener jtLog = _httpClient.doGET(reqPathLog, null, JSONResponseHandler.getInstance(), argJobID, argSinceLog);
+					        JSONArray jaLog = getSuccessPayload(jtLog).getJSONArray("log");
+
+					        NameValuePair argSinceConsole = new BasicNameValuePair("since", Integer.toString(sinceConsole));
+					        JSONTokener jtConsole = _httpClient.doGET(reqPathConsole, null, JSONResponseHandler.getInstance(), argJobID, argSinceConsole);
+					        JSONArray jaConsole = getSuccessPayload(jtConsole).getJSONArray("console");
+
+					        JSONObject joLog = null;
+					        long tsLog = Long.MAX_VALUE;
+					        String txtLog = null;
+					        Integer idLog = null;
+
+					        JSONObject joConsole = null;
+					        long tsConsole = Long.MAX_VALUE;
+					        String txtConsole = null;
+					        Integer idConsole = null;
+
+					        int i = 0, j = 0;
+
+					        if (jaLog.length() > 0) {
+						        joLog = jaLog.getJSONObject(i);
+					        	tsLog = joLog.getLong("ts");
+					        	txtLog = joLog.getString("t");
+					        	idLog = joLog.getInt("_id");
+					        }
+
+					        if (jaConsole.length() > 0) {
+					        	joConsole = jaConsole.getJSONObject(j);
+					        	tsConsole = joConsole.getLong("ts");
+					        	txtConsole = joConsole.getString("t");
+					        	idConsole = joConsole.getInt("_id");
+					        }
+
+				        	while (i < jaLog.length() || j < jaConsole.length()) {
+					        	while (tsLog <= tsConsole) {
+					        		writer.append(txtLog).append("\n");
+					        		sinceLog = idLog + 1;
+					        		i++;
+
+					        		if (i == jaLog.length()) {
+					        			argSinceLog = new BasicNameValuePair("since", Integer.toString(sinceLog));
+					        			jtLog = _httpClient.doGET(reqPathLog, null, JSONResponseHandler.getInstance(), argJobID, argSinceLog);
+						        		jaLog = getSuccessPayload(jtLog).getJSONArray("log");
+						        		i = 0;
+
+						        		if (joConsole == null) {
+						        			argSinceConsole = new BasicNameValuePair("since", Integer.toString(sinceConsole));
+						        			jtConsole = _httpClient.doGET(reqPathConsole, null, JSONResponseHandler.getInstance(), argJobID, argSinceConsole);
+						        			jaConsole = getSuccessPayload(jtConsole).getJSONArray("console");
+						        			j = 0;
+
+						        			if (jaConsole.length() > 0) {
+									        	joConsole = jaConsole.getJSONObject(j);
+									        	tsConsole = joConsole.getLong("ts");
+									        	txtConsole = joConsole.getString("t");
+									        	idConsole = joConsole.getInt("_id");
+									        }
+						        		}
+
+						        		if (jaLog.length() == 0) {
+						        			joLog = null;
+									        tsLog = Long.MAX_VALUE;
+									        txtLog = null;
+									        idLog = null;
+						        			break;
+						        		}
+					        		}
+
+						        	joLog = jaLog.getJSONObject(i);
+					        		tsLog = joLog.getLong("ts");
+						        	txtLog = joLog.getString("t");
+						        	idLog = joLog.getInt("_id");
+					        	}
+
+				        		while (tsConsole < tsLog) {
+					        		writer.append(txtConsole).append("\n");
+					        		sinceConsole = idConsole + 1;
+					        		j++;
+
+					        		if (j == jaConsole.length()) {
+					        			argSinceConsole = new BasicNameValuePair("since", Integer.toString(sinceConsole));
+					        			jtConsole = _httpClient.doGET(reqPathConsole, null, JSONResponseHandler.getInstance(), argJobID, argSinceConsole);
+					        			jaConsole = getSuccessPayload(jtConsole).getJSONArray("console");
+					        			j = 0;
+
+					        			if (joLog == null) {
+					        				argSinceLog = new BasicNameValuePair("since", Integer.toString(sinceLog));
+						        			jtLog = _httpClient.doGET(reqPathLog, null, JSONResponseHandler.getInstance(), argJobID, argSinceLog);
+							        		jaLog = getSuccessPayload(jtLog).getJSONArray("log");
+							        		i = 0;
+
+							        		if (jaLog.length() > 0) {
+										        joLog = jaLog.getJSONObject(i);
+									        	tsLog = joLog.getLong("ts");
+									        	txtLog = joLog.getString("t");
+									        	idLog = joLog.getInt("_id");
+									        }
+					        			}
+
+					        			if (jaConsole.length() == 0) {
+					        				joConsole = null;
+									        tsConsole = Long.MAX_VALUE;
+									        txtConsole = null;
+									        idConsole = null;
+					        				break;
+					        			}
+					        		}
+
+					        		joConsole = jaConsole.getJSONObject(j);
+					        		tsConsole = joConsole.getLong("ts");
+						        	txtConsole = joConsole.getString("t");
+						        	idConsole = joConsole.getInt("_id");
+				        		}
+				        	}
+
+					        writer.flush();
+					        Thread.sleep(500);
+				        } while (!isJobDone(jobStatus));
+			        }
+			        finally {
+			        	if (writer != null)
+			        		writer.close();
+			        }
+				}
+				catch (Exception e) {
+					getLogger().log(Level.WARNING, "Error retrieving flow output", e);
+
+					try {
+						out.close();
+					} catch (IOException e1) {}
+				}
+			}
+
+		}, jobID).start();
+
+        return in;
+    }
+
     /**
      * /services/jobs/submit.json
-     * 
+     *
      * @param flowUri The flow URI to run
      * @return The job id
      * @throws TransmissionException
      */
     public String submitJob(String flowUri) throws TransmissionException {
         String reqPath = "/services/jobs/submit.json";
-        
+
         NameValuePair argFlowUri = new BasicNameValuePair("uri", flowUri);
         JSONTokener jtResponse = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance(), argFlowUri);
-        
+
         try {
             JSONArray jaSubmitted = getSuccessPayload(jtResponse).getJSONArray("submitted");
-            
+
             return jaSubmitted.getJSONObject(0).getString("jobID");
         }
         catch (JSONException e) {
@@ -802,25 +976,24 @@ public class MeandreClient extends AbstractMeandreClient {
             return null;
         }
     }
-    
+
     /**
      * /services/jobs/list.json
-     * 
+     *
      * @param jobID The job id
-     * @return The job status
+     * @return The job status json object
      * @throws TransmissionException
      */
-    public String retrieveJobStatus(String jobID) throws TransmissionException {
+    public JSONObject retrieveJobStatus(String jobID) throws TransmissionException {
         String reqPath = "/services/jobs/list.json";
-        
+
         NameValuePair argJobId = new BasicNameValuePair("jobID", jobID);
         JSONTokener jtResponse = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance(), argJobId);
-        
+
         try {
             JSONArray jaJobs = getSuccessPayload(jtResponse).getJSONArray("jobs");
-            JSONArray jaProgress = jaJobs.getJSONObject(0).getJSONArray("progress");
-            
-            return jaProgress.getJSONObject(jaProgress.length() - 1).getString("status");
+
+            return jaJobs.getJSONObject(0);
         }
         catch (JSONException e) {
             throw new TransmissionException(e);
@@ -829,20 +1002,20 @@ public class MeandreClient extends AbstractMeandreClient {
             return null;
         }
     }
-    
+
     /**
      * /services/jobs/kill.json
-     * 
+     *
      * @param jobID The job id
      * @return True if request successful, False otherwise
      * @throws TransmissionException
      */
     public boolean killJob(String jobID) throws TransmissionException {
         String reqPath = "/services/jobs/kill.json";
-        
+
         NameValuePair argJobId = new BasicNameValuePair("jobID", jobID);
         JSONTokener jtResponse = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance(), argJobId);
-        
+
         try {
             return getSuccessPayload(jtResponse).getJSONArray("kill").length() == 1;
         }
@@ -886,7 +1059,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /services/jobs/console.txt
-     * 
+     *
      * @param jobID The job id
      * @return The job console
      * @throws TransmissionException
@@ -894,7 +1067,7 @@ public class MeandreClient extends AbstractMeandreClient {
     @Override
     public String retrieveJobConsole(String jobID) throws TransmissionException {
         String reqPath = "/services/jobs/console.txt";
-        
+
         NameValuePair argJobID = new BasicNameValuePair("jobID", jobID);
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance(), argJobID);
     }
@@ -905,7 +1078,7 @@ public class MeandreClient extends AbstractMeandreClient {
 
     /**
      * /public/services/repository.nt
-     * 
+     *
      * @return A QueryableRepository for the public repository
      * @throws TransmissionException
      */
@@ -916,13 +1089,13 @@ public class MeandreClient extends AbstractMeandreClient {
 
         Model model = ModelFactory.createDefaultModel();
         model.read(modelStream, null, "N-TRIPLE");
-        
+
         return new RepositoryImpl(model);
     }
 
     /**
      * /public/services/demo_repository.nt
-     * 
+     *
      * @return A QueryableRepository for the demo repository
      * @throws TransmissionException
      */
@@ -930,10 +1103,10 @@ public class MeandreClient extends AbstractMeandreClient {
     public QueryableRepository retrieveDemoRepository() throws TransmissionException {
         String reqPath = "/public/services/demo_repository.nt";
         InputStream modelStream = _httpClient.doGET(reqPath, null);
-        
+
         Model model = ModelFactory.createDefaultModel();
         model.read(modelStream, null, "N-TRIPLE");
-        
+
         return new RepositoryImpl(model);
     }
 
@@ -959,12 +1132,12 @@ public class MeandreClient extends AbstractMeandreClient {
     @Override
     public boolean abortFlow(int webUIPort) throws TransmissionException {
         String reqPath = "/admin/abort.txt";
-        String sExpected = "Abort request dispatched..."; 
-        
+        String sExpected = "Abort request dispatched...";
+
         GenericHttpClient client = new GenericHttpClient(_httpClient.getHost().getHostName(), webUIPort);
         try {
             String sRetrieved = client.doGET(reqPath, null, StringResponseHandler.getInstance());
-            
+
             return sRetrieved.equals(sExpected);
         }
         finally {
@@ -995,7 +1168,7 @@ public class MeandreClient extends AbstractMeandreClient {
         GenericHttpClient client = new GenericHttpClient(_httpClient.getHost().getHostName(), webUIPort);
         try {
             JSONTokener jtRetrieved = client.doGET(reqPath, null, JSONResponseHandler.getInstance());
-            
+
             return new JSONObject(jtRetrieved);
         }
         catch (JSONException e) {
@@ -1006,7 +1179,7 @@ public class MeandreClient extends AbstractMeandreClient {
         }
     }
 
-    /** 
+    /**
      * /services/repository/describe.nt
      *
      * @param componentUri The component URI
@@ -1016,33 +1189,44 @@ public class MeandreClient extends AbstractMeandreClient {
     public String retrieveComponentDescriptorAsString(String componentUri) throws TransmissionException {
         String reqPath = "/services/repository/describe.nt";
         NameValuePair argCompUri = new BasicNameValuePair("uri", componentUri);
-        
+
         return _httpClient.doGET(reqPath, null, StringResponseHandler.getInstance(), argCompUri);
     }
 
-    /** 
-     * FIXME: Needs proper implementation and server-side support
-     */
     @Override
-    public String getServerVersion() throws TransmissionException {
-        return "version = 2.0.0";
+    public JSONObject getServerVersion() throws TransmissionException {
+        String reqPath = "/public/services/version.json";
+        JSONTokener jtResponse = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
+        try {
+			return getSuccessPayload(jtResponse);
+		}
+        catch (JSONException e) {
+            throw new TransmissionException(e);
+		}
+        catch (OperationFailedException e) {
+        	getLogger().log(Level.WARNING, "Cannot obtain server version information", e);
+
+			try {
+				return new JSONObject().put("version", "unknown");
+			} catch (JSONException e1) { return null; }
+		}
     }
 
-    /** 
+    /**
      * @throws NotImplementedException
      */
     public String getServerPlugins() throws TransmissionException {
         throw new NotImplementedException();
     }
 
-    /** 
+    /**
      * @throws NotImplementedException
      */
     public String getComponentJarInfo(String jarFile) throws TransmissionException {
         throw new NotImplementedException();
     }
 
-    /** 
+    /**
      * /public/services/ping.json
      *
      *  @return True if it successfully pinged the server
@@ -1051,7 +1235,7 @@ public class MeandreClient extends AbstractMeandreClient {
     @Override
     public boolean ping() throws TransmissionException {
         String reqPath = "/public/services/ping.json";
-        
+
         JSONTokener jtResponse = _httpClient.doGET(reqPath, null, JSONResponseHandler.getInstance());
         try {
             return getSuccessPayload(jtResponse).has("message");
@@ -1063,22 +1247,34 @@ public class MeandreClient extends AbstractMeandreClient {
             return false;
         }
     }
-    
+
     private JSONObject getSuccessPayload(JSONTokener response) throws JSONException, OperationFailedException {
         JSONObject joResponse = new JSONObject(response);
         String status = joResponse.getString("status");
-        
+
         if (status.equals("OK"))
             return joResponse.getJSONObject("success");
-        
+
         if (status.equals("FAIL")) {
             JSONObject joFailure = joResponse.getJSONObject("failure");
             throw new OperationFailedException(joResponse.getString("message"), joFailure);
         }
-        
+
         throw new JSONException("Invalid response status: " + status);
     }
-    
+
+    private boolean isJobDone(JSONObject jobStatus) throws JSONException {
+    	boolean jobDone = false;
+
+    	String status = jobStatus.getString("status");
+
+    	if (status.equalsIgnoreCase("Done") || status.equalsIgnoreCase("Failed") ||
+    			status.equalsIgnoreCase("Aborted") || status.equalsIgnoreCase("Killed"))
+    		jobDone = true;
+
+    	return jobDone;
+    }
+
     @Override
     public String getHostName() {
         return _httpClient.getHost().getHostName();
