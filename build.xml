@@ -86,7 +86,7 @@
 	</target>
 
 	<target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
-		<svn failonerror="false" javahl="false" svnkit="true">
+		<svn refid="svn.settings">
 			<wcVersion path="${basedir}" prefix="svn.root." />
 		</svn>
 
