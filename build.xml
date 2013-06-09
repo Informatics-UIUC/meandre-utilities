@@ -296,6 +296,8 @@
 			<zipgroupfileset dir="${lib.dir}">
 				<include name="meandre-kernel*.jar" />
 				<include name="jena*.jar" />
+				<include name="arq*.jar" />
+				<include name="lucene-core*.jar" />
 				<include name="icu4j*.jar" />
 				<include name="iri*.jar" />
 				<include name="log4j*.jar" />
@@ -305,6 +307,8 @@
 				<include name="jsap*.jar" />
 				<include name="axis*.jar" />
 				<include name="confluence-soap*.jar" />
+				<include name="commons-logging*.jar" />
+				<include name="commons-discovery*.jar" />
 			</zipgroupfileset>
 		</jar>
 
