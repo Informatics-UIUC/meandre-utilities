@@ -40,303 +40,346 @@
   -->
 
 <project name="Meandre-Utilities" default="dist">
-	<import file="common.xml" />
+    <import file="common.xml" />
 
-	<!--#################### Project Properties #########################-->
+    <!--#################### Project Properties #########################-->
 
-	<property name="version" value="1.4.12" />
-	<property name="debug" value="true" />
-	<property name="compile.target" value="1.5" />
-
-
-	<property name="src.dir" value="${basedir}/src" />
-	<property name="src.test.dir" value="${basedir}/src-test" />
-	<property name="lib.dir" value="${basedir}/lib" />
-	<property name="build.dir" value="${basedir}/build/classes" />
-	<property name="build.test.dir" value="${basedir}/build/classes-test" />
-	<property name="dist.dir" value="${basedir}/dist" />
-	<property name="test.dir" value="${basedir}/test" />
-
-	<property name="version.template" value="${basedir}/version.tpl" />
-	<property name="version.file" value="${src.dir}/org/meandre/tools/Version.java" />
+    <property name="version" value="1.4.12" />
+    <property name="debug" value="true" />
+    <property name="compile.target" value="1.5" />
 
 
-	<!--#################### CLASS PATHS ####################-->
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="src.test.dir" value="${basedir}/src-test" />
+    <property name="lib.dir" value="${basedir}/lib" />
+    <property name="build.dir" value="${basedir}/build/classes" />
+    <property name="build.test.dir" value="${basedir}/build/classes-test" />
+    <property name="dist.dir" value="${basedir}/dist" />
+    <property name="test.dir" value="${basedir}/test" />
 
-	<path id="build.classpath">
-		<pathelement location="${build.dir}" />
-		<path refid="lib.classpath" />
-	</path>
+    <property name="version.template" value="${basedir}/version.tpl" />
+    <property name="version.file" value="${src.dir}/org/meandre/tools/Version.java" />
 
-	<path id="test.classpath">
-		<pathelement location="${build.test.dir}" />
-		<path refid="build.classpath" />
-	</path>
 
-	<path id="lib.classpath">
-		<fileset dir="${lib.dir}" includes="*.jar" />
-	</path>
+    <!--#################### CLASS PATHS ####################-->
 
-	<!--######################### BUILD TARGETS ###########################-->
+    <path id="build.classpath">
+        <pathelement location="${build.dir}" />
+        <path refid="lib.classpath" />
+    </path>
 
-	<target name="init">
-		<tstamp>
-			<format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z" />
-		</tstamp>
-	</target>
+    <path id="test.classpath">
+        <pathelement location="${build.test.dir}" />
+        <path refid="build.classpath" />
+    </path>
 
-	<target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
-		<svn refid="svn.settings">
-			<wcVersion path="${basedir}" prefix="svn.root." />
-		</svn>
+    <path id="lib.classpath">
+        <fileset dir="${lib.dir}" includes="*.jar" />
+    </path>
 
-		<condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="">
-			<isset property="svn.root.revision.max-with-flags" />
-		</condition>
+    <!--######################### BUILD TARGETS ###########################-->
 
-		<property name="revision" value="${svn_revision}" />
+    <target name="init">
+        <tstamp>
+            <format property="TIMESTAMP" pattern="MMM d, yyyy h:mm:ssa Z" />
+        </tstamp>
+    </target>
 
-		<copy file="${version.template}" toFile="${version.file}" overwrite="true">
-			<filterset>
-				<filter token="VERSION" value="${version}" />
-				<filter token="REVISION" value="${revision}" />
-			</filterset>
-		</copy>
-	</target>
+    <target name="prepare" depends="init" description="-> performs necessary preparation tasks for the build">
+        <svn refid="svn.settings">
+            <wcVersion path="${basedir}" prefix="svn.root." />
+        </svn>
 
-	<target name="clean" description="-> removes all auto-generated files/folders">
-		<delete dir="${build.dir}" />
-		<delete dir="${build.test.dir}" />
-		<delete dir="${dist.dir}" />
-		<delete dir="${test.dir}/clover" />
-		<delete dir="${test.dir}/xml" />
-		<delete dir="${test.dir}/report" />
-	</target>
+        <condition property="svn_revision" value="${svn.root.revision.max-with-flags}" else="">
+            <isset property="svn.root.revision.max-with-flags" />
+        </condition>
 
-	<target name="compile" depends="prepare" description="-> compiles the project code">
-		<mkdir dir="${build.dir}" />
-		<javac target="${compile.target}" source="${compile.target}" srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.classpath" debug="${debug}" includeantruntime="false" />
-	</target>
+        <property name="revision" value="${svn_revision}" />
 
-	<target name="compile-tests" depends="compile" description="-> compiles the test code">
-		<mkdir dir="${build.test.dir}" />
-		<javac target="${compile.target}" source="${compile.target}" srcdir="${src.test.dir}" destdir="${build.test.dir}" classpathref="build.classpath" debug="${debug}" includeantruntime="false" />
-	</target>
+        <copy file="${version.template}" toFile="${version.file}" overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${version}" />
+                <filter token="REVISION" value="${revision}" />
+            </filterset>
+        </copy>
+    </target>
 
-	<target name="run-tests" depends="compile-tests" description="-> runs the test suite">
-		<mkdir dir="${test.dir}/xml" />
-		<junit fork="yes" dir="${test.dir}/output" printsummary="yes" showoutput="yes" haltonfailure="yes">
-			<classpath>
-				<pathelement path="${java.class.path}" />
-			</classpath>
-			<classpath refid="test.classpath" />
-			<formatter type="xml" />
+    <target name="clean" description="-> removes all auto-generated files/folders">
+        <delete dir="${build.dir}" />
+        <delete dir="${build.test.dir}" />
+        <delete dir="${dist.dir}" />
+        <delete dir="${test.dir}/clover" />
+        <delete dir="${test.dir}/xml" />
+        <delete dir="${test.dir}/report" />
+    </target>
 
-			<batchtest todir="${test.dir}/xml">
-				<fileset dir="${src.test.dir}" includes="**/*Test*.java" />
-			</batchtest>
-		</junit>
-	</target>
+    <target name="compile" depends="prepare" description="-> compiles the project code">
+        <mkdir dir="${build.dir}" />
+        <javac target="${compile.target}" source="${compile.target}" srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.classpath" debug="${debug}" includeantruntime="false" />
+    </target>
 
-	<target name="tests-report" description="-> creates a test report for the test suite">
-		<mkdir dir="${test.dir}/report" />
-		<junitreport todir="${test.dir}/xml">
-			<fileset dir="${test.dir}/xml" includes="TEST-*.xml" />
-			<report format="noframes" todir="${test.dir}/report" />
-		</junitreport>
-		<echo message="Report at: file://${test.dir}/report/junit-noframes.html" />
-	</target>
+    <target name="compile-tests" depends="compile" description="-> compiles the test code">
+        <mkdir dir="${build.test.dir}" />
+        <javac target="${compile.target}" source="${compile.target}" srcdir="${src.test.dir}" destdir="${build.test.dir}" classpathref="build.classpath" debug="${debug}" includeantruntime="false" />
+    </target>
 
-	<target name="dist" depends="compile" description="-> creates project  distribution">
-		<mkdir dir="${dist.dir}" />
+    <target name="run-tests" depends="compile-tests" description="-> runs the test suite">
+        <mkdir dir="${test.dir}/xml" />
+        <junit fork="yes" dir="${test.dir}/output" printsummary="yes" showoutput="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement path="${java.class.path}" />
+            </classpath>
+            <classpath refid="test.classpath" />
+            <formatter type="xml" />
 
-		<jar destfile="${dist.dir}/meandre-utilities-${version}.jar" basedir="${build.dir}">
-			<manifest>
-				<attribute name="Implementation-Title" value="Meandre Utilities" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-			</manifest>
-		</jar>
+            <batchtest todir="${test.dir}/xml">
+                <fileset dir="${src.test.dir}" includes="**/*Test*.java" />
+            </batchtest>
+        </junit>
+    </target>
 
-		<jar destfile="${dist.dir}/meandre-client-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/client/**">
-			<manifest>
-				<attribute name="Implementation-Title" value="MeandreClient" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-			</manifest>
+    <target name="tests-report" description="-> creates a test report for the test suite">
+        <mkdir dir="${test.dir}/report" />
+        <junitreport todir="${test.dir}/xml">
+            <fileset dir="${test.dir}/xml" includes="TEST-*.xml" />
+            <report format="noframes" todir="${test.dir}/report" />
+        </junitreport>
+        <echo message="Report at: file://${test.dir}/report/junit-noframes.html" />
+    </target>
 
-			<fileset dir="${src.dir}" includes="org/meandre/tools/client/**" />
-		</jar>
+    <target name="dist" depends="compile" description="-> creates project  distribution">
+        <mkdir dir="${dist.dir}" />
 
-		<jar destfile="${dist.dir}/meandre-client-deps-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/client/**">
-			<manifest>
-				<attribute name="Implementation-Title" value="MeandreClient" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-			</manifest>
+        <jar destfile="${dist.dir}/meandre-utilities-${version}.jar" basedir="${build.dir}">
+            <manifest>
+                <attribute name="Implementation-Title" value="Meandre Utilities" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+            </manifest>
+        </jar>
 
-			<zipgroupfileset dir="${lib.dir}">
-				<include name="httpclient*.jar" />
-				<include name="httpcore*.jar" />
-				<include name="httpmime*.jar" />
-				<include name="apache-mime4j*.jar" />
-				<include name="commons-codec*.jar" />
-				<include name="commons-logging*.jar" />
-				<include name="seasr-commons*.jar" />
-				<include name="json*.jar" />
-				<include name="meandre-kernel*.jar" />
-				<include name="jena*.jar" />
-				<include name="arq*.jar" />
-				<include name="icu4j*.jar" />
-				<include name="iri*.jar" />
-				<include name="log4j*.jar" />
-				<include name="slf4j-api*.jar" />
-				<include name="slf4j-log4j12*.jar" />
-				<include name="stax-api*.jar" />
-				<include name="wstx-asl*.jar" />
-				<include name="xercesImpl*.jar" />
-				<include name="lucene-core*.jar" />
-			</zipgroupfileset>
-		</jar>
+        <jar destfile="${dist.dir}/meandre-client-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/client/**">
+            <manifest>
+                <attribute name="Implementation-Title" value="MeandreClient" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+            </manifest>
 
-		<jar destfile="${dist.dir}/meandre-component-installer-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/components/installer/**">
-			<manifest>
-				<attribute name="Implementation-Title" value="Meandre Component Installer" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="org.meandre.tools.components.installer.InstallComponentsCMD" />
-			</manifest>
+            <fileset dir="${src.dir}" includes="org/meandre/tools/client/**" />
+        </jar>
 
-			<zipgroupfileset dir="${dist.dir}" includes="meandre-client-deps-${version}.jar" />
+        <jar destfile="${dist.dir}/meandre-client-deps-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/client/**">
+            <manifest>
+                <attribute name="Implementation-Title" value="MeandreClient" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+            </manifest>
 
-			<zipgroupfileset dir="${lib.dir}">
-				<include name="jsap*.jar" />
-				<include name="meandre-annotation*.jar" />
-				<include name="jarjar*.jar" />
-			</zipgroupfileset>
-		</jar>
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="fluent-hc*.jar" />
+                <include name="httpclient*.jar" />
+                <include name="httpcore*.jar" />
+                <include name="httpmime*.jar" />
+                <include name="apache-mime4j*.jar" />
+                <include name="commons-codec*.jar" />
+                <include name="commons-logging*.jar" />
+                <include name="seasr-commons*.jar" />
+                <include name="json*.jar" />
+                <include name="meandre-kernel*.jar" />
+                <include name="jena*.jar" />
+                <include name="arq*.jar" />
+                <include name="icu4j*.jar" />
+                <include name="iri*.jar" />
+                <include name="log4j*.jar" />
+                <include name="slf4j-api*.jar" />
+                <include name="slf4j-log4j12*.jar" />
+                <include name="stax-api*.jar" />
+                <include name="wstx-asl*.jar" />
+                <include name="xercesImpl*.jar" />
+                <include name="lucene-core*.jar" />
+            </zipgroupfileset>
+        </jar>
 
-		<jar destfile="${dist.dir}/meandre-create-descriptors-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/components/CreateDescriptors*">
-			<manifest>
-				<attribute name="Implementation-Title" value="Meandre Create Descriptors" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="org.meandre.tools.components.CreateDescriptors" />
-			</manifest>
+        <jar destfile="${dist.dir}/meandre-component-installer-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/components/installer/**">
+            <manifest>
+                <attribute name="Implementation-Title" value="Meandre Component Installer" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="org.meandre.tools.components.installer.InstallComponentsCMD" />
+            </manifest>
 
-			<zipgroupfileset dir="${lib.dir}">
-				<include name="meandre-annotation*.jar" />
-				<include name="meandre-kernel*.jar" />
-				<include name="seasr-commons*.jar" />
-				<include name="jena*.jar" />
-				<include name="icu4j*.jar" />
-				<include name="iri*.jar" />
-				<include name="log4j*.jar" />
-				<include name="slf4j-api*.jar" />
-				<include name="slf4j-log4j12*.jar" />
-				<include name="xercesImpl*.jar" />
-			</zipgroupfileset>
-		</jar>
+            <zipgroupfileset dir="${dist.dir}" includes="meandre-client-deps-${version}.jar" />
 
-		<jar destfile="${dist.dir}/rdf2zz-${version}.jar">
-			<manifest>
-				<attribute name="Implementation-Title" value="RDF-to-ZigZag Converter" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="org.meandre.tools.zigzag.transformations.RDF2ZZMain" />
-			</manifest>
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="jsap*.jar" />
+                <include name="meandre-annotation*.jar" />
+                <include name="jarjar*.jar" />
+            </zipgroupfileset>
+        </jar>
 
-			<fileset dir="${build.dir}">
-				<include name="org/meandre/tools/zigzag/transformations/**" />
-				<include name="org/meandre/tools/Version.class" />
-			</fileset>
-		</jar>
+        <jar destfile="${dist.dir}/meandre-create-descriptors-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/components/CreateDescriptors*">
+            <manifest>
+                <attribute name="Implementation-Title" value="Meandre Create Descriptors" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="org.meandre.tools.components.CreateDescriptors" />
+            </manifest>
 
-		<jar destfile="${dist.dir}/rdf2zz-deps-${version}.jar">
-			<manifest>
-				<attribute name="Implementation-Title" value="RDF-to-ZigZag Converter" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="org.meandre.tools.zigzag.transformations.RDF2ZZMain" />
-			</manifest>
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="meandre-annotation*.jar" />
+                <include name="meandre-kernel*.jar" />
+                <include name="seasr-commons*.jar" />
+                <include name="jena*.jar" />
+                <include name="icu4j*.jar" />
+                <include name="iri*.jar" />
+                <include name="log4j*.jar" />
+                <include name="slf4j-api*.jar" />
+                <include name="slf4j-log4j12*.jar" />
+                <include name="xercesImpl*.jar" />
+            </zipgroupfileset>
+        </jar>
 
-			<fileset dir="${build.dir}">
-				<include name="org/meandre/tools/zigzag/transformations/**" />
-				<include name="org/meandre/tools/Version.class" />
-			</fileset>
+        <jar destfile="${dist.dir}/rdf2zz-${version}.jar">
+            <manifest>
+                <attribute name="Implementation-Title" value="RDF-to-ZigZag Converter" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="org.meandre.tools.zigzag.transformations.RDF2ZZMain" />
+            </manifest>
 
-			<zipgroupfileset dir="${dist.dir}" includes="meandre-client-deps-${version}.jar" />
-			<zipgroupfileset dir="${lib.dir}" includes="jsap*.jar" />
-		</jar>
+            <fileset dir="${build.dir}">
+                <include name="org/meandre/tools/zigzag/transformations/**" />
+                <include name="org/meandre/tools/Version.class" />
+            </fileset>
+        </jar>
 
-		<jar destfile="${dist.dir}/create-wiki-component-pages-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/wiki/**">
-			<manifest>
-				<attribute name="Implementation-Title" value="Create Confluence Wiki Component Pages" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="org.meandre.tools.wiki.WikiCreateComponentPages" />
-			</manifest>
+        <jar destfile="${dist.dir}/rdf2zz-deps-${version}.jar">
+            <manifest>
+                <attribute name="Implementation-Title" value="RDF-to-ZigZag Converter" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="org.meandre.tools.zigzag.transformations.RDF2ZZMain" />
+            </manifest>
 
-			<zipgroupfileset dir="${lib.dir}">
-				<include name="meandre-kernel*.jar" />
-				<include name="jena*.jar" />
-				<include name="arq*.jar" />
-				<include name="lucene-core*.jar" />
-				<include name="icu4j*.jar" />
-				<include name="iri*.jar" />
-				<include name="log4j*.jar" />
-				<include name="slf4j-api*.jar" />
-				<include name="slf4j-log4j12*.jar" />
-				<include name="xercesImpl*.jar" />
-				<include name="jsap*.jar" />
-				<include name="axis*.jar" />
-				<include name="confluence-soap*.jar" />
-				<include name="commons-logging*.jar" />
-				<include name="commons-discovery*.jar" />
-			</zipgroupfileset>
-		</jar>
+            <fileset dir="${build.dir}">
+                <include name="org/meandre/tools/zigzag/transformations/**" />
+                <include name="org/meandre/tools/Version.class" />
+            </fileset>
 
-		<jar destfile="${dist.dir}/location-to-sc-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/repository/LocationToSC*">
-			<manifest>
-				<attribute name="Implementation-Title" value="Upload Location to SEASR Central" />
-				<attribute name="Implementation-Version" value="${version}.${revision}" />
-				<attribute name="Implementation-Vendor" value="NCSA/ALG" />
-				<attribute name="Build-Date" value="${TIMESTAMP}" />
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="org.meandre.tools.repository.LocationToSC" />
-			</manifest>
+            <zipgroupfileset dir="${dist.dir}" includes="meandre-client-deps-${version}.jar" />
+            <zipgroupfileset dir="${lib.dir}" includes="jsap*.jar" />
+        </jar>
 
-			<zipgroupfileset dir="${lib.dir}">
-				<include name="meandre-kernel*.jar" />
-				<include name="seasr-commons*.jar" />
-				<include name="jsap*.jar" />
-				<include name="json*.jar" />
-				<include name="jena*.jar" />
-				<include name="icu4j*.jar" />
-				<include name="iri*.jar" />
-				<include name="log4j*.jar" />
-				<include name="slf4j-api*.jar" />
-				<include name="slf4j-log4j12*.jar" />
-				<include name="xercesImpl*.jar" />
-			</zipgroupfileset>
-		</jar>
-	</target>
+        <jar destfile="${dist.dir}/create-wiki-component-pages-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/wiki/**">
+            <manifest>
+                <attribute name="Implementation-Title" value="Create Confluence Wiki Component Pages" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="org.meandre.tools.wiki.WikiCreateComponentPages" />
+            </manifest>
+
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="meandre-kernel*.jar" />
+                <include name="jena*.jar" />
+                <include name="arq*.jar" />
+                <include name="lucene-core*.jar" />
+                <include name="icu4j*.jar" />
+                <include name="iri*.jar" />
+                <include name="log4j*.jar" />
+                <include name="slf4j-api*.jar" />
+                <include name="slf4j-log4j12*.jar" />
+                <include name="xercesImpl*.jar" />
+                <include name="jsap*.jar" />
+                <include name="axis*.jar" />
+                <include name="confluence-soap*.jar" />
+                <include name="commons-logging*.jar" />
+                <include name="commons-discovery*.jar" />
+            </zipgroupfileset>
+        </jar>
+
+        <jar destfile="${dist.dir}/location-to-sc-${version}.jar" basedir="${build.dir}" includes="org/meandre/tools/repository/LocationToSC*">
+            <manifest>
+                <attribute name="Implementation-Title" value="Upload Location to SEASR Central" />
+                <attribute name="Implementation-Version" value="${version}.${revision}" />
+                <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                <attribute name="Build-Date" value="${TIMESTAMP}" />
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="org.meandre.tools.repository.LocationToSC" />
+            </manifest>
+
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="meandre-kernel*.jar" />
+                <include name="seasr-commons*.jar" />
+                <include name="jsap*.jar" />
+                <include name="json*.jar" />
+                <include name="jena*.jar" />
+                <include name="icu4j*.jar" />
+                <include name="iri*.jar" />
+                <include name="log4j*.jar" />
+                <include name="slf4j-api*.jar" />
+                <include name="slf4j-log4j12*.jar" />
+                <include name="xercesImpl*.jar" />
+            </zipgroupfileset>
+        </jar>
+
+          <jar destfile="${dist.dir}/CreateRepository-${version}.jar" basedir="${build.dir}">
+                <manifest>
+                    <attribute name="Implementation-Title" value="Create Repository of Components and/or Flows" />
+                    <attribute name="Implementation-Version" value="${version}.${revision}" />
+                    <attribute name="Implementation-Vendor" value="NCSA/ALG" />
+                    <attribute name="Build-Date" value="${TIMESTAMP}" />
+                    <attribute name="Built-By" value="${user.name}" />
+                    <attribute name="Main-Class" value="org.meandre.tools.repository.CreateRepository" />
+                </manifest>
+
+            <fileset dir="${build.dir}">
+                <include name="org/meandre/tools/client/**" />
+                <include name="org/meandre/tools/repository/CreateRepository*" />
+            </fileset>
+
+                <zipgroupfileset dir="${lib.dir}">
+                    <include name="fluent-hc*.jar" />
+                    <include name="httpclient*.jar" />
+                    <include name="httpcore*.jar" />
+                    <include name="httpmime*.jar" />
+                    <include name="apache-mime4j*.jar" />
+                    <include name="commons-codec*.jar" />
+                    <include name="commons-logging*.jar" />
+                    <include name="seasr-commons*.jar" />
+                    <include name="json*.jar" />
+                    <include name="meandre-kernel*.jar" />
+                    <include name="jena*.jar" />
+                    <include name="arq*.jar" />
+                    <include name="icu4j*.jar" />
+                    <include name="iri*.jar" />
+                    <include name="log4j*.jar" />
+                    <include name="slf4j-api*.jar" />
+                    <include name="slf4j-log4j12*.jar" />
+                    <include name="stax-api*.jar" />
+                    <include name="wstx-asl*.jar" />
+                    <include name="xercesImpl*.jar" />
+                    <include name="lucene-core*.jar" />
+                    <include name="webdavclient*.jar" />
+                    <include name="jsap*.jar" />
+                </zipgroupfileset>
+            </jar>
+    </target>
 
 </project>
 
