@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -186,7 +187,9 @@ public class CreateRepository {
         Model componentModel = models[0];
         Model flowModel = models[1];
 
-        HttpHost davHost = new HttpHost(destination);                
+        URL url = new URL(destination);
+        String host = url.getHost();
+        HttpHost davHost = new HttpHost(host);
         WebdavClient webdav = WebdavClientFactory.begin(davHost, davCredentials);
 
         if (!webdav.mkdirs(destination))
@@ -225,7 +228,8 @@ public class CreateRepository {
                         System.out.println("  Uploading: " + newContextUri);
                         //System.out.println("       From: " + contextURL);
 
-                        webdav.put(newContextUri, contextURL.openStream());
+                        InputStream contextStream = contextURL.openStream();
+                        webdav.put(newContextUri, contextStream);
                         webdav.put(md5Uri, serverMD5.getBytes());
                     } else
                         System.out.println("   Skipping: " + newContextUri);
@@ -343,8 +347,7 @@ public class CreateRepository {
             for (RDFNode context : compContext) {
                 String contextUrl = context.toString();
 
-                // rewrite the context URL if it points to localhost
-                if (contextUrl.startsWith("http://127.0.0.1") || contextUrl.startsWith("http://localhost")) {
+                if (context.isResource() && contextUrl.toLowerCase().endsWith(".jar")) {
                     try {
                         URL url = new URL(contextUrl);
                         contextUrl =  server + url.getPath();
@@ -352,9 +355,7 @@ public class CreateRepository {
                     catch (MalformedURLException e) {
                         fail(e);
                     }
-                }
 
-                if (context.isResource() && contextUrl.toLowerCase().endsWith(".jar")) {
                     // Generate the new location for the context
                     String contextName = contextUrl.substring(contextUrl.lastIndexOf('/') + 1);
                     String newContextURL = destination + "/resources/" + contextName;

@@ -115,12 +115,12 @@
 
 	<target name="compile" depends="prepare" description="-> compiles the project code">
 		<mkdir dir="${build.dir}" />
-		<javac target="${compile.target}" srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.classpath" debug="${debug}" includeantruntime="false" />
+		<javac target="${compile.target}" source="${compile.target}" srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.classpath" debug="${debug}" includeantruntime="false" />
 	</target>
 
 	<target name="compile-tests" depends="compile" description="-> compiles the test code">
 		<mkdir dir="${build.test.dir}" />
-		<javac target="${compile.target}" srcdir="${src.test.dir}" destdir="${build.test.dir}" classpathref="build.classpath" debug="${debug}" includeantruntime="false" />
+		<javac target="${compile.target}" source="${compile.target}" srcdir="${src.test.dir}" destdir="${build.test.dir}" classpathref="build.classpath" debug="${debug}" includeantruntime="false" />
 	</target>
 
 	<target name="run-tests" depends="compile-tests" description="-> runs the test suite">
